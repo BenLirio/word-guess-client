@@ -1,12 +1,12 @@
-import { useState } from 'react'
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
-import './App.css'
-import Home from './pages/Home'
-import About from './pages/About'
+import { useState } from "react";
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import "./App.css";
+import Home from "./pages/Home";
+import About from "./pages/About";
 
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/word-guess-client">
       <div className="min-h-screen bg-gray-100">
         <nav className="bg-white shadow-md p-4">
           <div className="container mx-auto flex justify-between">
@@ -36,7 +36,7 @@ function App() {
         </footer>
       </div>
     </BrowserRouter>
-  )
+  );
 }
 
-export default App
+export default App;
