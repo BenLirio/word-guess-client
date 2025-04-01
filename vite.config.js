@@ -1,28 +1,28 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
   // Base path for deployment - change if needed for your hosting platform
-  base: './',
+  base: "/word-guess-client/",
   server: {
     // Development server settings
     port: 3000,
-    open: true
+    open: true,
   },
   build: {
     // Production build settings
-    outDir: 'dist',
-    minify: 'terser',
+    outDir: "dist",
+    minify: "terser",
     sourcemap: false,
     // You can add environment-specific settings here
     rollupOptions: {
       output: {
         manualChunks: {
-          vendor: ['react', 'react-dom', 'react-router-dom']
-        }
-      }
-    }
-  }
-})
+          vendor: ["react", "react-dom", "react-router-dom"],
+        },
+      },
+    },
+  },
+});
