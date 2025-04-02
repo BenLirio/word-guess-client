@@ -51,7 +51,14 @@ const GuessWordGraph: React.FC = () => {
           text: string;
         };
         ticks: {
+          font?: {
+            size: number;
+          };
+          color?: string;
           callback: (value: number) => string | number;
+        };
+        grid?: {
+          color: string;
         };
       };
       y: {
@@ -62,7 +69,14 @@ const GuessWordGraph: React.FC = () => {
           text: string;
         };
         ticks: {
+          font?: {
+            size: number;
+          };
+          color?: string;
           callback: (value: number) => string | number;
+        };
+        grid?: {
+          color: string;
         };
       };
     };
@@ -75,13 +89,17 @@ const GuessWordGraph: React.FC = () => {
         max: 1,
         title: {
           display: true,
-          text: "X-Axis",
+          text: "",
         },
         ticks: {
+          font: {
+            size: 24, // Increase the font size for x-axis labels
+          },
+          color: "white", // Set text color to white
           callback: (value: number) => {
             if (value === 0) return "big";
             if (value === 1) return "small";
-            return value;
+            return "";
           },
         },
       },
@@ -90,13 +108,17 @@ const GuessWordGraph: React.FC = () => {
         max: 1,
         title: {
           display: true,
-          text: "Y-Axis",
+          text: "",
         },
         ticks: {
+          font: {
+            size: 24, // Increase the font size for y-axis labels
+          },
+          color: "white", // Set text color to white
           callback: (value: number) => {
             if (value === 0) return "cool";
             if (value === 1) return "lame";
-            return value;
+            return "";
           },
         },
       },
