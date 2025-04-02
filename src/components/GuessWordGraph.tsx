@@ -1,128 +1,32 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from "react";
-import { Scatter } from "react-chartjs-2";
-import {
-  Chart as ChartJS,
-  LinearScale,
-  PointElement,
-  Tooltip,
-  Legend,
-} from "chart.js";
 import { guessWord } from "../api"; // Import the API function
-
-// Register Chart.js components
-ChartJS.register(LinearScale, PointElement, Tooltip, Legend);
+import GraphCanvas from "./GraphCanvas"; // Import the new GraphCanvas component
 
 const GuessWordGraph: React.FC = () => {
   const [dataPoints, setDataPoints] = useState<{ x: number; y: number }[]>([]);
   const [word, setWord] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleGuess = async () => {
     if (!word) {
-      alert("Please enter a word to guess.");
+      setError("Please enter a word to guess.");
       return;
     }
+
+    setError(null); // Clear any previous error
+    setIsLoading(true); // Disable the button while the request is in progress
 
     try {
       const response = await guessWord({ word });
       setDataPoints((prev) => [...prev, { x: response.x, y: response.y }]);
     } catch (error) {
       console.error("Error calling the API:", error);
-      alert("Failed to fetch data from the API.");
+      setError("Failed to fetch data from the API. Please try again.");
+    } finally {
+      setIsLoading(false); // Re-enable the button after the request is complete
     }
-  };
-
-  const chartData = {
-    datasets: [
-      {
-        label: "Guess Word Results",
-        data: dataPoints,
-        backgroundColor: "rgba(75, 192, 192, 0.6)",
-      },
-    ],
-  };
-
-  interface ChartOptions {
-    scales: {
-      x: {
-        min: number;
-        max: number;
-        title: {
-          display: boolean;
-          text: string;
-        };
-        ticks: {
-          font?: {
-            size: number;
-          };
-          color?: string;
-          callback: (value: number) => string | number;
-        };
-        grid?: {
-          color: string;
-        };
-      };
-      y: {
-        min: number;
-        max: number;
-        title: {
-          display: boolean;
-          text: string;
-        };
-        ticks: {
-          font?: {
-            size: number;
-          };
-          color?: string;
-          callback: (value: number) => string | number;
-        };
-        grid?: {
-          color: string;
-        };
-      };
-    };
-  }
-
-  const chartOptions: ChartOptions = {
-    scales: {
-      x: {
-        min: 0,
-        max: 1,
-        title: {
-          display: true,
-          text: "",
-        },
-        ticks: {
-          font: {
-            size: 24, // Increase the font size for x-axis labels
-          },
-          color: "white", // Set text color to white
-          callback: (value: number) => {
-            if (value === 0) return "big";
-            if (value === 1) return "small";
-            return "";
-          },
-        },
-      },
-      y: {
-        min: 0,
-        max: 1,
-        title: {
-          display: true,
-          text: "",
-        },
-        ticks: {
-          font: {
-            size: 24, // Increase the font size for y-axis labels
-          },
-          color: "white", // Set text color to white
-          callback: (value: number) => {
-            if (value === 0) return "cool";
-            if (value === 1) return "lame";
-            return "";
-          },
-        },
-      },
-    },
   };
 
   return (
@@ -134,9 +38,12 @@ const GuessWordGraph: React.FC = () => {
         onChange={(e) => setWord(e.target.value)}
         placeholder="Enter a word"
       />
-      <button onClick={handleGuess}>Submit Guess</button>
-      <div style={{ width: "800px", height: "600px", margin: "0 auto" }}>
-        <Scatter data={chartData} options={chartOptions} />
+      <button onClick={handleGuess} disabled={isLoading}>
+        {isLoading ? "Submitting..." : "Submit Guess"}
+      </button>
+      {error && <p>{error}</p>}
+      <div>
+        <GraphCanvas dataPoints={dataPoints} />
       </div>
     </div>
   );
