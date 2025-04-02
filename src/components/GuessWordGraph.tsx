@@ -41,7 +41,34 @@ const GuessWordGraph: React.FC = () => {
     ],
   };
 
-  const chartOptions = {
+  interface ChartOptions {
+    scales: {
+      x: {
+        min: number;
+        max: number;
+        title: {
+          display: boolean;
+          text: string;
+        };
+        ticks: {
+          callback: (value: number) => string | number;
+        };
+      };
+      y: {
+        min: number;
+        max: number;
+        title: {
+          display: boolean;
+          text: string;
+        };
+        ticks: {
+          callback: (value: number) => string | number;
+        };
+      };
+    };
+  }
+
+  const chartOptions: ChartOptions = {
     scales: {
       x: {
         min: 0,
@@ -50,6 +77,13 @@ const GuessWordGraph: React.FC = () => {
           display: true,
           text: "X-Axis",
         },
+        ticks: {
+          callback: (value: number) => {
+            if (value === 0) return "big";
+            if (value === 1) return "small";
+            return value;
+          },
+        },
       },
       y: {
         min: 0,
@@ -57,6 +91,13 @@ const GuessWordGraph: React.FC = () => {
         title: {
           display: true,
           text: "Y-Axis",
+        },
+        ticks: {
+          callback: (value: number) => {
+            if (value === 0) return "cool";
+            if (value === 1) return "lame";
+            return value;
+          },
         },
       },
     },
@@ -72,7 +113,9 @@ const GuessWordGraph: React.FC = () => {
         placeholder="Enter a word"
       />
       <button onClick={handleGuess}>Submit Guess</button>
-      <Scatter data={chartData} options={chartOptions} />
+      <div style={{ width: "800px", height: "600px", margin: "0 auto" }}>
+        <Scatter data={chartData} options={chartOptions} />
+      </div>
     </div>
   );
 };
