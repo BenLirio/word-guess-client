@@ -6,6 +6,14 @@ interface GraphCanvasProps {
 
 const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+
+  const setAspectRatio = () => {
+    if (containerRef.current) {
+      const width = containerRef.current.offsetWidth;
+      containerRef.current.style.height = `${width}px`;
+    }
+  };
 
   const drawGraph = () => {
     const canvas = canvasRef.current;
@@ -64,17 +72,31 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
   };
 
   useEffect(() => {
+    setAspectRatio();
+    window.addEventListener("resize", setAspectRatio);
+    return () => {
+      window.removeEventListener("resize", setAspectRatio);
+    };
+  }, []);
+
+  useEffect(() => {
     drawGraph();
   }, [dataPoints]);
 
   return (
-    <div style={{ width: "100%", height: "100%", position: "relative" }}>
+    <div
+      ref={containerRef}
+      style={{
+        width: "100%",
+        position: "relative",
+        backgroundColor: "black",
+      }}
+    >
       <canvas
         ref={canvasRef}
         style={{
           width: "100%",
           height: "100%",
-          backgroundColor: "black",
         }}
       />
     </div>
