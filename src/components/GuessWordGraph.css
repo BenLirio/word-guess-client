@@ -62,7 +62,7 @@ button:hover:not(:disabled) {
   border-color: #00cc00; /* Slightly darker green border on hover */
 }
 
-p {
+.error-message {
   color: #ff6b6b; /* Light red for error messages */
   font-size: 14px;
   font-family: "Press Start 2P", monospace; /* Retro pixelated font */

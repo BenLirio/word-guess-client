@@ -46,7 +46,7 @@ const GuessWordGraph: React.FC = () => {
           {isLoading ? "Submitting..." : "Submit Guess"}
         </button>
       </div>
-      {error && <p>{error}</p>}
+      {error && <p className="error-message">{error}</p>}
       <div className="graph-container">
         <GraphCanvas dataPoints={dataPoints} />
       </div>

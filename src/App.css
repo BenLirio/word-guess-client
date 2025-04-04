@@ -40,3 +40,22 @@
 .read-the-docs {
   color: #888;
 }
+
+.footer {
+  margin-top: 2em;
+  padding: 1em;
+  background-color: #1e1e1e; /* Dark background */
+  color: #f5f5f5; /* Light text */
+  font-family: "Press Start 2P", monospace; /* Retro pixelated font */
+  border-radius: 10px;
+  text-align: center;
+}
+
+.footer-link {
+  color: #39ff14;
+  text-decoration: none;
+}
+
+.footer-link:hover {
+  color: #2ecc71;
+}
