@@ -60,7 +60,7 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
   }, [dataPoints, target]);
 
   const drawGrid = (ctx: CanvasRenderingContext2D, rect: DOMRect) => {
-    ctx.strokeStyle = "white";
+    ctx.strokeStyle = "#00FF00"; // Neon green
     ctx.lineWidth = 1;
 
     const gridY =
@@ -85,12 +85,26 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
       rect.height - CANVAS_MARGIN - 0.5 * (rect.height - 2 * CANVAS_MARGIN);
     const gridX = CANVAS_MARGIN + 0.5 * (rect.width - 2 * CANVAS_MARGIN);
 
-    ctx.fillStyle = "white";
-    ctx.font = AXIS_LABEL_FONT;
+    ctx.fillStyle = "#00FF00"; // Neon green
+    ctx.font = "16px 'Press Start 2P', monospace"; // Retro pixelated font
 
     // Horizontal axis labels
-    ctx.fillText("big", CANVAS_MARGIN - 30, gridY + 5);
-    ctx.fillText("small", rect.width - CANVAS_MARGIN + 10, gridY + 5);
+    const leftWord = "big";
+    ctx.save();
+    ctx.translate(CANVAS_MARGIN - 10, gridY + leftWord.length * 4);
+    ctx.rotate(-Math.PI / 2); // Rotate 90 degrees counterclockwise
+    ctx.fillText(leftWord, 0, 0);
+    ctx.restore();
+
+    const rightWord = "small";
+    ctx.save();
+    ctx.translate(
+      rect.width - CANVAS_MARGIN + 20,
+      gridY + rightWord.length * 4
+    );
+    ctx.rotate(-Math.PI / 2); // Rotate 90 degrees counterclockwise
+    ctx.fillText(rightWord, 0, 0);
+    ctx.restore();
 
     // Vertical axis labels
     ctx.fillText("cool", gridX - 20, rect.height - CANVAS_MARGIN + 20);
@@ -102,8 +116,6 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
       const gridY =
         rect.height - CANVAS_MARGIN - 0.5 * (rect.height - 2 * CANVAS_MARGIN);
       const gridX = CANVAS_MARGIN + 0.5 * (rect.width - 2 * CANVAS_MARGIN);
-
-      ctx.fillStyle = "white";
 
       // Horizontal axis arrows
       drawArrow(
@@ -158,7 +170,9 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
 
         ctx.beginPath();
         ctx.arc(canvasX, canvasY, DATA_POINT_RADIUS, 0, 2 * Math.PI);
-        ctx.fillStyle = "rgba(75, 192, 192, 0.6)";
+        ctx.fillStyle = "rgba(0, 255, 0, 0.8)"; // Glowing neon green
+        ctx.shadowColor = "#00FF00";
+        ctx.shadowBlur = 10;
         ctx.fill();
       });
     },
@@ -178,8 +192,10 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
 
       ctx.beginPath();
       ctx.arc(targetX, targetY, TARGET_RADIUS, 0, 2 * Math.PI);
-      ctx.strokeStyle = "red";
+      ctx.strokeStyle = "red"; // Glowing red
       ctx.lineWidth = 2;
+      ctx.shadowColor = "red";
+      ctx.shadowBlur = 15;
       ctx.stroke();
     },
     [target]
