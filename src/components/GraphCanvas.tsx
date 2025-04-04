@@ -1,4 +1,6 @@
 import React, { useRef, useEffect, useState, useCallback } from "react";
+import { getSpectrum } from "../api"; // Import the getSpectrum function
+import { GetSpectrumResponse } from "../types";
 
 // Constants for canvas layout
 const CANVAS_MARGIN = 50;
@@ -15,6 +17,8 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [target, setTarget] = useState<{ x: number; y: number } | null>(null);
   const [showWinModal, setShowWinModal] = useState(false);
+  const [spectrumLabels, setSpectrumLabels] =
+    useState<GetSpectrumResponse | null>(null);
 
   const setAspectRatio = () => {
     if (containerRef.current) {
@@ -84,39 +88,55 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
     ctx.stroke();
   };
 
-  const drawAxisLabels = (ctx: CanvasRenderingContext2D, rect: DOMRect) => {
-    const gridY =
-      rect.height - CANVAS_MARGIN - 0.5 * (rect.height - 2 * CANVAS_MARGIN);
-    const gridX = CANVAS_MARGIN + 0.5 * (rect.width - 2 * CANVAS_MARGIN);
+  const drawAxisLabels = useCallback(
+    (ctx: CanvasRenderingContext2D, rect: DOMRect) => {
+      if (!spectrumLabels) return; // Wait until spectrum labels are fetched
 
-    ctx.fillStyle = "#00FF00"; // Neon green
-    ctx.font = "16px 'Press Start 2P', monospace"; // Retro pixelated font
+      const gridY =
+        rect.height - CANVAS_MARGIN - 0.5 * (rect.height - 2 * CANVAS_MARGIN);
+      const gridX = CANVAS_MARGIN + 0.5 * (rect.width - 2 * CANVAS_MARGIN);
 
-    // Horizontal axis labels
-    const leftWord = "big";
-    ctx.save();
-    ctx.translate(CANVAS_MARGIN - 10, gridY + leftWord.length * 4);
-    ctx.rotate(-Math.PI / 2); // Rotate 90 degrees counterclockwise
-    ctx.fillText(leftWord, 0, 0);
-    ctx.restore();
+      ctx.fillStyle = "#E0E0E0"; // Light gray for labels
+      ctx.font = "16px 'Press Start 2P', monospace"; // Retro pixelated font
 
-    const rightWord = "small";
-    ctx.save();
-    ctx.translate(
-      rect.width - CANVAS_MARGIN + 20,
-      gridY + rightWord.length * 4
-    );
-    ctx.rotate(-Math.PI / 2); // Rotate 90 degrees counterclockwise
-    ctx.fillText(rightWord, 0, 0);
-    ctx.restore();
+      // Horizontal axis labels
+      const leftWord = spectrumLabels.x.left;
+      ctx.save();
+      ctx.translate(CANVAS_MARGIN - 10, gridY + leftWord.length * 4);
+      ctx.rotate(-Math.PI / 2); // Rotate 90 degrees counterclockwise
+      ctx.fillText(leftWord, 0, 0);
+      ctx.restore();
 
-    // Vertical axis labels
-    ctx.fillText("cool", gridX - 20, rect.height - CANVAS_MARGIN + 20);
-    ctx.fillText("lame", gridX - 20, CANVAS_MARGIN - 10);
-  };
+      const rightWord = spectrumLabels.x.right;
+      ctx.save();
+      ctx.translate(
+        rect.width - CANVAS_MARGIN + 20,
+        gridY + rightWord.length * 4
+      );
+      ctx.rotate(-Math.PI / 2); // Rotate 90 degrees counterclockwise
+      ctx.fillText(rightWord, 0, 0);
+      ctx.restore();
+
+      // Vertical axis labels
+      const topWord = spectrumLabels.y.left;
+      ctx.fillText(
+        spectrumLabels.y.left,
+        gridX - topWord.length * 4,
+        rect.height - CANVAS_MARGIN + 20
+      );
+      const bottomWord = spectrumLabels.y.right;
+      ctx.fillText(
+        spectrumLabels.y.right,
+        gridX - bottomWord.length * 4,
+        CANVAS_MARGIN - 10
+      );
+    },
+    [spectrumLabels] // Dependencies
+  );
 
   const drawAxisArrows = useCallback(
     (ctx: CanvasRenderingContext2D, rect: DOMRect) => {
+      ctx.fillStyle = "#00FF00"; // Neon green
       const gridY =
         rect.height - CANVAS_MARGIN - 0.5 * (rect.height - 2 * CANVAS_MARGIN);
       const gridX = CANVAS_MARGIN + 0.5 * (rect.width - 2 * CANVAS_MARGIN);
@@ -234,7 +254,7 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
     drawAxisArrows(ctx, rect);
     drawDataPoints(ctx, rect);
     drawTarget(ctx, rect);
-  }, [drawAxisArrows, drawDataPoints, drawTarget]);
+  }, [drawAxisArrows, drawAxisLabels, drawDataPoints, drawTarget]);
 
   useEffect(() => {
     setAspectRatio();
@@ -256,6 +276,20 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
       y: Math.random() * (1 - TARGET_SIZE_FACTOR) + TARGET_SIZE_FACTOR / 2, // Ensure the target stays within vertical bounds
     };
     setTarget(randomTarget);
+  }, []);
+
+  useEffect(() => {
+    // Fetch spectrum labels when the component mounts
+    const fetchSpectrumLabels = async () => {
+      try {
+        const response = await getSpectrum({});
+        setSpectrumLabels(response);
+      } catch (error) {
+        console.error("Failed to fetch spectrum labels:", error);
+      }
+    };
+
+    fetchSpectrumLabels();
   }, []);
 
   return (
