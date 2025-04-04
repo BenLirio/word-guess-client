@@ -1,12 +1,11 @@
 import React, { useRef, useEffect, useState, useCallback } from "react";
-import { getSpectrum } from "../api"; // Import the getSpectrum function
-import { GetSpectrumResponse } from "../types";
+import { getSpectrum, getTarget } from "../api"; // Import the getSpectrum function
+import { GetSpectrumResponse, WordTarget } from "../types";
 
 // Constants for canvas layout
 const CANVAS_MARGIN = 50;
 const DATA_POINT_RADIUS = 3;
 const ARROW_SIZE = 10;
-const TARGET_SIZE_FACTOR = 0.15; // Adjust this value to control the target size relative to the canvas width
 
 interface GraphCanvasProps {
   dataPoints: { x: number; y: number }[];
@@ -15,7 +14,7 @@ interface GraphCanvasProps {
 const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const [target, setTarget] = useState<{ x: number; y: number } | null>(null);
+  const [target, setTarget] = useState<WordTarget | null>(null);
   const [showWinModal, setShowWinModal] = useState(false);
   const [spectrumLabels, setSpectrumLabels] =
     useState<GetSpectrumResponse | null>(null);
@@ -48,7 +47,7 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
       target.y * (rect.height - 2 * CANVAS_MARGIN);
 
     // Scale the target size based on the canvas dimensions
-    const scaledTargetSize = rect.width * TARGET_SIZE_FACTOR;
+    const scaledTargetSize = rect.width * target.size;
 
     dataPoints.forEach(({ x, y }) => {
       const canvasX = CANVAS_MARGIN + x * (rect.width - 2 * CANVAS_MARGIN);
@@ -216,7 +215,7 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
         target.y * (rect.height - 2 * CANVAS_MARGIN);
 
       // Scale the target size based on the canvas dimensions
-      const scaledTargetSize = rect.width * TARGET_SIZE_FACTOR;
+      const scaledTargetSize = rect.width * target.size;
 
       // Draw the square target
       ctx.beginPath();
@@ -270,15 +269,6 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
   }, [drawGraph, checkWinCondition]);
 
   useEffect(() => {
-    // Generate a random target point when the component mounts
-    const randomTarget = {
-      x: Math.random() * (1 - TARGET_SIZE_FACTOR) + TARGET_SIZE_FACTOR / 2, // Ensure the target stays within horizontal bounds
-      y: Math.random() * (1 - TARGET_SIZE_FACTOR) + TARGET_SIZE_FACTOR / 2, // Ensure the target stays within vertical bounds
-    };
-    setTarget(randomTarget);
-  }, []);
-
-  useEffect(() => {
     // Fetch spectrum labels when the component mounts
     const fetchSpectrumLabels = async () => {
       try {
@@ -290,6 +280,20 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
     };
 
     fetchSpectrumLabels();
+  }, []);
+
+  useEffect(() => {
+    // Fetch target
+    const fetchTarget = async () => {
+      try {
+        const response = await getTarget({});
+        setTarget(response);
+      } catch (error) {
+        console.error("Failed to fetch target:", error);
+      }
+    };
+
+    fetchTarget();
   }, []);
 
   return (

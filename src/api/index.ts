@@ -7,6 +7,9 @@ import {
   GetSpectrumFunction,
   GetSpectrumRequest,
   GetSpectrumResponse,
+  GetTargetFunction,
+  GetTargetRequest,
+  GetTargetResponse,
 } from "../types";
 
 const API_URL =
@@ -61,6 +64,33 @@ export const getSpectrum: GetSpectrumFunction = async (
 
   try {
     const response = await axios.post<GetSpectrumResponse>(API_URL, payload, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error making the API request:", error);
+    throw error;
+  }
+};
+
+/**
+ * Sends a request to get the target data from the API and returns the response.
+ * @param request - The request object (empty for this function).
+ * @returns The API response containing target data.
+ * @throws An error if the request fails.
+ */
+export const getTarget: GetTargetFunction = async (
+  request: GetTargetRequest
+): Promise<GetTargetResponse> => {
+  const payload: RequestWrapper = {
+    functionName: "getTarget",
+    request,
+  };
+
+  try {
+    const response = await axios.post<GetTargetResponse>(API_URL, payload, {
       headers: {
         "Content-Type": "application/json",
       },
