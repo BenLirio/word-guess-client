@@ -1,0 +1,67 @@
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  text-align: center;
+  font-family: Arial, sans-serif;
+  background-color: #1e1e1e; /* Dark background */
+  color: #f5f5f5; /* Light text */
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+h2 {
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: #ffffff; /* White text for the heading */
+}
+
+input[type="text"] {
+  width: 80%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #444; /* Darker border */
+  border-radius: 5px;
+  font-size: 16px;
+  background-color: #2a2a2a; /* Dark input background */
+  color: #f5f5f5; /* Light text */
+}
+
+input[type="text"]:focus {
+  outline: none;
+  border-color: #007bff; /* Blue border on focus */
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 16px;
+  color: #fff;
+  background-color: #007bff; /* Blue button */
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:disabled {
+  background-color: #555; /* Disabled button in dark mode */
+  cursor: not-allowed;
+}
+
+button:hover:not(:disabled) {
+  background-color: #0056b3; /* Darker blue on hover */
+}
+
+p {
+  color: #ff6b6b; /* Light red for error messages */
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+.graph-container {
+  margin-top: 20px;
+  border: 1px solid #444; /* Darker border for the graph container */
+  border-radius: 5px;
+  padding: 10px;
+  background-color: #2a2a2a; /* Dark background for the graph container */
+}

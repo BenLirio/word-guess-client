@@ -10,14 +10,17 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
 
   const setAspectRatio = () => {
     if (containerRef.current) {
-      const width = containerRef.current.offsetWidth;
-      containerRef.current.style.height = `${width}px`; // Set height equal to width for 1:1 aspect ratio
+      // get window width and height
+      const windowWidth = window.innerWidth;
+      const windowHeight = window.innerHeight;
+      const width = Math.min(windowWidth, windowHeight) * 0.8;
+      containerRef.current.style.width = `${width}px`; // Set the container width
 
       // Adjust canvas size to match the container
       const canvas = canvasRef.current;
       if (canvas) {
         canvas.style.width = `${width}px`;
-        canvas.style.height = `${width}px`;
+        canvas.style.height = `${width}px`; // Maintain 1:1 aspect ratio
       }
     }
   };
@@ -99,14 +102,13 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
     <div
       ref={containerRef}
       style={{
-        width: "100%",
         position: "relative",
       }}
     >
       <div
         style={{
-          backgroundColor: "black", // Canvas background color
-          borderRadius: "15px", // Rounded corners for the black container
+          backgroundColor: "#2A2A2A",
+          borderRadius: "5px", // Rounded corners for the black container
           padding: "5px", // Optional inner padding for spacing
         }}
       >

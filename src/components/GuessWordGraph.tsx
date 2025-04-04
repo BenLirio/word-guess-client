@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { guessWord } from "../api"; // Import the API function
 import GraphCanvas from "./GraphCanvas"; // Import the new GraphCanvas component
+import "./GuessWordGraph.css"; // Import the CSS file
 
 const GuessWordGraph: React.FC = () => {
   const [dataPoints, setDataPoints] = useState<{ x: number; y: number }[]>([]);
@@ -30,7 +31,7 @@ const GuessWordGraph: React.FC = () => {
   };
 
   return (
-    <div>
+    <div className="container">
       <h2>Guess Word Graph</h2>
       <input
         type="text"
@@ -42,7 +43,7 @@ const GuessWordGraph: React.FC = () => {
         {isLoading ? "Submitting..." : "Submit Guess"}
       </button>
       {error && <p>{error}</p>}
-      <div>
+      <div className="graph-container">
         <GraphCanvas dataPoints={dataPoints} />
       </div>
     </div>
