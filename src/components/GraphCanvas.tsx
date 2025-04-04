@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState, useCallback } from "react";
 import { getSpectrum, getTarget } from "../api"; // Import the getSpectrum function
-import { GetSpectrumResponse, WordTarget } from "../types";
+import { GetSpectrumResponse, GuessWordResponse, WordTarget } from "../types";
 
 // Constants for canvas layout
 const CANVAS_MARGIN = 50;
@@ -8,7 +8,7 @@ const DATA_POINT_RADIUS = 3;
 const ARROW_SIZE = 10;
 
 interface GraphCanvasProps {
-  dataPoints: { x: number; y: number }[];
+  dataPoints: GuessWordResponse[];
 }
 
 const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
@@ -35,36 +35,9 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
   };
 
   const checkWinCondition = useCallback(() => {
-    if (!target) return;
-
-    const rect = canvasRef.current?.getBoundingClientRect();
-    if (!rect) return;
-
-    const targetX = CANVAS_MARGIN + target.x * (rect.width - 2 * CANVAS_MARGIN);
-    const targetY =
-      rect.height -
-      CANVAS_MARGIN -
-      target.y * (rect.height - 2 * CANVAS_MARGIN);
-
-    // Scale the target size based on the canvas dimensions
-    const scaledTargetSize = rect.width * target.size;
-
-    dataPoints.forEach(({ x, y }) => {
-      const canvasX = CANVAS_MARGIN + x * (rect.width - 2 * CANVAS_MARGIN);
-      const canvasY =
-        rect.height - CANVAS_MARGIN - y * (rect.height - 2 * CANVAS_MARGIN);
-
-      // Check if the data point is inside the target's bounding box
-      if (
-        canvasX >= targetX - scaledTargetSize / 2 &&
-        canvasX <= targetX + scaledTargetSize / 2 &&
-        canvasY >= targetY - scaledTargetSize / 2 &&
-        canvasY <= targetY + scaledTargetSize / 2
-      ) {
-        setShowWinModal(true); // Show the win modal
-      }
-    });
-  }, [dataPoints, target]);
+    const won = dataPoints.filter(({ hitTarget }) => hitTarget).length > 0;
+    setShowWinModal(won);
+  }, [dataPoints]);
 
   const drawGrid = (ctx: CanvasRenderingContext2D, rect: DOMRect) => {
     ctx.strokeStyle = "#00FF00"; // Neon green

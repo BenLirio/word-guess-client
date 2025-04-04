@@ -21,6 +21,7 @@ export interface GuessWordRequest {
 export interface GuessWordResponse {
   x: number;
   y: number;
+  hitTarget: boolean;
 }
 export type GuessWordFunction = (
   request: GuessWordRequest

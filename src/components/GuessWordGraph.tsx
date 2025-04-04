@@ -3,9 +3,10 @@ import React, { useState } from "react";
 import { guessWord } from "../api"; // Import the API function
 import GraphCanvas from "./GraphCanvas"; // Import the new GraphCanvas component
 import "./GuessWordGraph.css"; // Import the CSS file
+import { GuessWordResponse } from "../types";
 
 const GuessWordGraph: React.FC = () => {
-  const [dataPoints, setDataPoints] = useState<{ x: number; y: number }[]>([]);
+  const [dataPoints, setDataPoints] = useState<GuessWordResponse[]>([]);
   const [word, setWord] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -21,7 +22,7 @@ const GuessWordGraph: React.FC = () => {
 
     try {
       const response = await guessWord({ word });
-      setDataPoints((prev) => [...prev, { x: response.x, y: response.y }]);
+      setDataPoints((prev) => [...prev, response]);
     } catch (error) {
       console.error("Error calling the API:", error);
       setError("Failed to fetch data from the API. Please try again.");
