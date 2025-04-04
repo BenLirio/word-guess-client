@@ -11,7 +11,14 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
   const setAspectRatio = () => {
     if (containerRef.current) {
       const width = containerRef.current.offsetWidth;
-      containerRef.current.style.height = `${width}px`;
+      containerRef.current.style.height = `${width}px`; // Set height equal to width for 1:1 aspect ratio
+
+      // Adjust canvas size to match the container
+      const canvas = canvasRef.current;
+      if (canvas) {
+        canvas.style.width = `${width}px`;
+        canvas.style.height = `${width}px`;
+      }
     }
   };
 
@@ -51,6 +58,11 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
     ctx.lineTo(gridX, 50);
     ctx.stroke();
 
+    // Draw border around the grid
+    ctx.strokeStyle = "white";
+    ctx.lineWidth = 2; // Slightly thicker for the border
+    ctx.strokeRect(50, 50, rect.width - 100, rect.height - 100);
+
     // Draw labels
     ctx.fillStyle = "white";
     ctx.font = "16px Arial";
@@ -89,16 +101,25 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
       style={{
         width: "100%",
         position: "relative",
-        backgroundColor: "black",
       }}
     >
-      <canvas
-        ref={canvasRef}
+      <div
         style={{
-          width: "100%",
-          height: "100%",
+          backgroundColor: "black", // Canvas background color
+          borderRadius: "15px", // Rounded corners for the black container
+          padding: "5px", // Optional inner padding for spacing
         }}
-      />
+      >
+        <canvas
+          ref={canvasRef}
+          style={{
+            width: "100%",
+            height: "100%",
+            display: "block", // Remove any inline spacing
+            borderRadius: "10px", // Match the canvas corners to the inner container
+          }}
+        />
+      </div>
     </div>
   );
 };
