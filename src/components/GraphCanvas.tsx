@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 
 interface GraphCanvasProps {
   dataPoints: { x: number; y: number }[];
@@ -7,29 +7,52 @@ interface GraphCanvasProps {
 const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const [target, setTarget] = useState<{ x: number; y: number } | null>(null);
+  const [showWinModal, setShowWinModal] = useState(false);
 
   const setAspectRatio = () => {
     if (containerRef.current) {
-      // get window width and height
       const windowWidth = window.innerWidth;
       const windowHeight = window.innerHeight;
       const width = Math.min(windowWidth, windowHeight) * 0.8;
-      containerRef.current.style.width = `${width}px`; // Set the container width
+      containerRef.current.style.width = `${width}px`;
 
-      // Adjust canvas size to match the container
       const canvas = canvasRef.current;
       if (canvas) {
         canvas.style.width = `${width}px`;
-        canvas.style.height = `${width}px`; // Maintain 1:1 aspect ratio
+        canvas.style.height = `${width}px`;
       }
     }
+  };
+
+  const checkWinCondition = () => {
+    if (!target) return;
+
+    const targetRadius = 8; // Same as the target circle radius
+    const rect = canvasRef.current?.getBoundingClientRect();
+    if (!rect) return;
+
+    const targetX = 50 + target.x * (rect.width - 100);
+    const targetY = rect.height - 50 - target.y * (rect.height - 100);
+
+    dataPoints.forEach(({ x, y }) => {
+      const canvasX = 50 + x * (rect.width - 100);
+      const canvasY = rect.height - 50 - y * (rect.height - 100);
+
+      const distance = Math.sqrt(
+        Math.pow(canvasX - targetX, 2) + Math.pow(canvasY - targetY, 2)
+      );
+
+      if (distance <= targetRadius) {
+        setShowWinModal(true); // Show the win modal
+      }
+    });
   };
 
   const drawGraph = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    // Set canvas resolution to match its rendered size
     const rect = canvas.getBoundingClientRect();
     canvas.width = rect.width * window.devicePixelRatio;
     canvas.height = rect.height * window.devicePixelRatio;
@@ -37,36 +60,29 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    // Scale the context for high-DPI screens
     ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
-
-    // Clear the canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // Draw grid lines
     ctx.strokeStyle = "white";
     ctx.lineWidth = 1;
 
-    // Horizontal grid line at y = 0.5
     const gridY = rect.height - 50 - 0.5 * (rect.height - 100);
     ctx.beginPath();
     ctx.moveTo(50, gridY);
     ctx.lineTo(rect.width - 50, gridY);
     ctx.stroke();
 
-    // Vertical grid line at x = 0.5
     const gridX = 50 + 0.5 * (rect.width - 100);
     ctx.beginPath();
     ctx.moveTo(gridX, rect.height - 50);
     ctx.lineTo(gridX, 50);
     ctx.stroke();
 
-    // Draw border around the grid
     ctx.strokeStyle = "white";
-    ctx.lineWidth = 2; // Slightly thicker for the border
+    ctx.lineWidth = 2;
     ctx.strokeRect(50, 50, rect.width - 100, rect.height - 100);
 
-    // Draw labels
     ctx.fillStyle = "white";
     ctx.font = "16px Arial";
     ctx.fillText("big", 50, rect.height - 20);
@@ -74,16 +90,28 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
     ctx.fillText("cool", 10, rect.height - 50);
     ctx.fillText("lame", 10, 60);
 
-    // Draw data points
+    // Draw data points (guesses)
     dataPoints.forEach(({ x, y }) => {
       const canvasX = 50 + x * (rect.width - 100);
       const canvasY = rect.height - 50 - y * (rect.height - 100);
 
       ctx.beginPath();
-      ctx.arc(canvasX, canvasY, 5, 0, 2 * Math.PI);
+      ctx.arc(canvasX, canvasY, 3, 0, 2 * Math.PI); // Smaller circles for guesses
       ctx.fillStyle = "rgba(75, 192, 192, 0.6)";
       ctx.fill();
     });
+
+    // Draw target as an empty circle
+    if (target) {
+      const targetX = 50 + target.x * (rect.width - 100);
+      const targetY = rect.height - 50 - target.y * (rect.height - 100);
+
+      ctx.beginPath();
+      ctx.arc(targetX, targetY, 8, 0, 2 * Math.PI); // Larger radius for the target
+      ctx.strokeStyle = "red"; // Outline color for the target
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
   };
 
   useEffect(() => {
@@ -96,7 +124,17 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
 
   useEffect(() => {
     drawGraph();
-  }, [dataPoints]);
+    checkWinCondition();
+  }, [dataPoints, target]);
+
+  useEffect(() => {
+    // Generate a random target point when the component mounts
+    const randomTarget = {
+      x: Math.random(), // Random x between 0 and 1
+      y: Math.random(), // Random y between 0 and 1
+    };
+    setTarget(randomTarget);
+  }, []);
 
   return (
     <div
@@ -108,8 +146,8 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
       <div
         style={{
           backgroundColor: "#2A2A2A",
-          borderRadius: "5px", // Rounded corners for the black container
-          padding: "5px", // Optional inner padding for spacing
+          borderRadius: "5px",
+          padding: "5px",
         }}
       >
         <canvas
@@ -117,11 +155,30 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
           style={{
             width: "100%",
             height: "100%",
-            display: "block", // Remove any inline spacing
-            borderRadius: "10px", // Match the canvas corners to the inner container
+            display: "block",
+            borderRadius: "10px",
           }}
         />
       </div>
+      {showWinModal && (
+        <div
+          style={{
+            width: "100%",
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            backgroundColor: "yellow",
+            padding: "20px",
+            borderRadius: "10px",
+            textAlign: "center",
+            animation: "pop-in 0.5s ease",
+          }}
+        >
+          <h1 style={{ fontSize: "2rem", color: "red" }}>🎉 YOU WIN! 🎉</h1>
+          <p style={{ fontSize: "1.2rem" }}>Great job hitting the target!</p>
+        </div>
+      )}
     </div>
   );
 };
