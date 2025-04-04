@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState, useCallback } from "react";
 
 interface GraphCanvasProps {
   dataPoints: { x: number; y: number }[];
@@ -25,7 +25,7 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
     }
   };
 
-  const checkWinCondition = () => {
+  const checkWinCondition = useCallback(() => {
     if (!target) return;
 
     const targetRadius = 8; // Same as the target circle radius
@@ -47,9 +47,111 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
         setShowWinModal(true); // Show the win modal
       }
     });
+  }, [dataPoints, target]);
+
+  const drawGrid = (ctx: CanvasRenderingContext2D, rect: DOMRect) => {
+    ctx.strokeStyle = "white";
+    ctx.lineWidth = 1;
+
+    const gridY = rect.height - 50 - 0.5 * (rect.height - 100);
+    const gridX = 50 + 0.5 * (rect.width - 100);
+
+    // Draw horizontal grid line
+    ctx.beginPath();
+    ctx.moveTo(50, gridY);
+    ctx.lineTo(rect.width - 50, gridY);
+    ctx.stroke();
+
+    // Draw vertical grid line
+    ctx.beginPath();
+    ctx.moveTo(gridX, rect.height - 50);
+    ctx.lineTo(gridX, 50);
+    ctx.stroke();
   };
 
-  const drawGraph = () => {
+  const drawAxisLabels = (ctx: CanvasRenderingContext2D, rect: DOMRect) => {
+    const gridY = rect.height - 50 - 0.5 * (rect.height - 100);
+    const gridX = 50 + 0.5 * (rect.width - 100);
+
+    ctx.fillStyle = "white";
+    ctx.font = "16px Arial";
+
+    // Horizontal axis labels
+    ctx.fillText("big", 20, gridY + 5);
+    ctx.fillText("small", rect.width - 40, gridY + 5);
+
+    // Vertical axis labels
+    ctx.fillText("cool", gridX - 20, rect.height - 30);
+    ctx.fillText("lame", gridX - 20, 40);
+  };
+
+  const drawAxisArrows = useCallback(
+    (ctx: CanvasRenderingContext2D, rect: DOMRect) => {
+      const gridY = rect.height - 50 - 0.5 * (rect.height - 100);
+      const gridX = 50 + 0.5 * (rect.width - 100);
+
+      ctx.fillStyle = "white";
+
+      // Horizontal axis arrows
+      drawArrow(ctx, rect.width - 50, gridY, -10, -5, -10, 5); // Right end
+      drawArrow(ctx, 50, gridY, 10, -5, 10, 5); // Left end
+
+      // Vertical axis arrows
+      drawArrow(ctx, gridX, 50, -5, 10, 5, 10); // Up end
+      drawArrow(ctx, gridX, rect.height - 50, -5, -10, 5, -10); // Down end
+    },
+    []
+  );
+
+  const drawArrow = (
+    ctx: CanvasRenderingContext2D,
+    x: number,
+    y: number,
+    dx1: number,
+    dy1: number,
+    dx2: number,
+    dy2: number
+  ) => {
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x + dx1, y + dy1);
+    ctx.lineTo(x + dx2, y + dy2);
+    ctx.closePath();
+    ctx.fill();
+  };
+
+  const drawDataPoints = useCallback(
+    (ctx: CanvasRenderingContext2D, rect: DOMRect) => {
+      dataPoints.forEach(({ x, y }) => {
+        const canvasX = 50 + x * (rect.width - 100);
+        const canvasY = rect.height - 50 - y * (rect.height - 100);
+
+        ctx.beginPath();
+        ctx.arc(canvasX, canvasY, 3, 0, 2 * Math.PI);
+        ctx.fillStyle = "rgba(75, 192, 192, 0.6)";
+        ctx.fill();
+      });
+    },
+    [dataPoints]
+  );
+
+  const drawTarget = useCallback(
+    (ctx: CanvasRenderingContext2D, rect: DOMRect) => {
+      if (!target) return;
+
+      const targetX = 50 + target.x * (rect.width - 100);
+      const targetY = rect.height - 50 - target.y * (rect.height - 100);
+
+      ctx.beginPath();
+      ctx.arc(targetX, targetY, 8, 0, 2 * Math.PI);
+      ctx.strokeStyle = "red";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    },
+    [target]
+  );
+
+  const drawGraph = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -63,91 +165,12 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
     ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Draw grid lines
-    ctx.strokeStyle = "white";
-    ctx.lineWidth = 1;
-
-    const gridY = rect.height - 50 - 0.5 * (rect.height - 100);
-    ctx.beginPath();
-    ctx.moveTo(50, gridY);
-    ctx.lineTo(rect.width - 50, gridY);
-    ctx.stroke();
-
-    const gridX = 50 + 0.5 * (rect.width - 100);
-    ctx.beginPath();
-    ctx.moveTo(gridX, rect.height - 50);
-    ctx.lineTo(gridX, 50);
-    ctx.stroke();
-
-    ctx.strokeStyle = "white";
-    ctx.lineWidth = 2;
-
-    ctx.fillStyle = "white";
-    ctx.font = "16px Arial";
-    ctx.fillText("big", 20, gridY + 5); // Adjusted to align with y=0.5
-    ctx.fillText("small", rect.width - 40, gridY + 5); // Adjusted to align with y=0.5
-    ctx.fillText("cool", gridX - 20, rect.height - 30); // Adjusted to align with x=0.5
-    ctx.fillText("lame", gridX - 20, 40); // Adjusted to align with x=0.5
-
-    // Draw horizontal axis arrow (right end)
-    ctx.beginPath();
-    ctx.moveTo(rect.width - 50, gridY); // End of the horizontal axis
-    ctx.lineTo(rect.width - 60, gridY - 5); // Top of the arrow
-    ctx.lineTo(rect.width - 60, gridY + 5); // Bottom of the arrow
-    ctx.closePath();
-    ctx.fillStyle = "white";
-    ctx.fill();
-
-    // Draw horizontal axis arrow (left end)
-    ctx.beginPath();
-    ctx.moveTo(50, gridY); // Start of the horizontal axis
-    ctx.lineTo(60, gridY - 5); // Top of the arrow
-    ctx.lineTo(60, gridY + 5); // Bottom of the arrow
-    ctx.closePath();
-    ctx.fillStyle = "white";
-    ctx.fill();
-
-    // Draw vertical axis arrow (up end)
-    ctx.beginPath();
-    ctx.moveTo(gridX, 50); // End of the vertical axis
-    ctx.lineTo(gridX - 5, 60); // Left of the arrow
-    ctx.lineTo(gridX + 5, 60); // Right of the arrow
-    ctx.closePath();
-    ctx.fillStyle = "white";
-    ctx.fill();
-
-    // Draw vertical axis arrow (down end)
-    ctx.beginPath();
-    ctx.moveTo(gridX, rect.height - 50); // Start of the vertical axis
-    ctx.lineTo(gridX - 5, rect.height - 60); // Left of the arrow
-    ctx.lineTo(gridX + 5, rect.height - 60); // Right of the arrow
-    ctx.closePath();
-    ctx.fillStyle = "white";
-    ctx.fill();
-
-    // Draw data points (guesses)
-    dataPoints.forEach(({ x, y }) => {
-      const canvasX = 50 + x * (rect.width - 100);
-      const canvasY = rect.height - 50 - y * (rect.height - 100);
-
-      ctx.beginPath();
-      ctx.arc(canvasX, canvasY, 3, 0, 2 * Math.PI); // Smaller circles for guesses
-      ctx.fillStyle = "rgba(75, 192, 192, 0.6)";
-      ctx.fill();
-    });
-
-    // Draw target as an empty circle
-    if (target) {
-      const targetX = 50 + target.x * (rect.width - 100);
-      const targetY = rect.height - 50 - target.y * (rect.height - 100);
-
-      ctx.beginPath();
-      ctx.arc(targetX, targetY, 8, 0, 2 * Math.PI); // Larger radius for the target
-      ctx.strokeStyle = "red"; // Outline color for the target
-      ctx.lineWidth = 2;
-      ctx.stroke();
-    }
-  };
+    drawGrid(ctx, rect);
+    drawAxisLabels(ctx, rect);
+    drawAxisArrows(ctx, rect);
+    drawDataPoints(ctx, rect);
+    drawTarget(ctx, rect);
+  }, [drawAxisArrows, drawDataPoints, drawTarget]);
 
   useEffect(() => {
     setAspectRatio();
@@ -160,7 +183,7 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
   useEffect(() => {
     drawGraph();
     checkWinCondition();
-  }, [dataPoints, target]);
+  }, [drawGraph, checkWinCondition]);
 
   useEffect(() => {
     // Generate a random target point when the component mounts
