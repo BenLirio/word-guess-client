@@ -33,15 +33,19 @@ const GuessWordGraph: React.FC = () => {
   return (
     <div className="container">
       <h2>Guess Word Graph</h2>
-      <input
-        type="text"
-        value={word}
-        onChange={(e) => setWord(e.target.value)}
-        placeholder="Enter a word"
-      />
-      <button onClick={handleGuess} disabled={isLoading}>
-        {isLoading ? "Submitting..." : "Submit Guess"}
-      </button>
+      <div className="input-container">
+        <input
+          type="text"
+          value={word}
+          onChange={(e) => setWord(e.target.value)}
+          placeholder="Enter a word"
+        />
+      </div>
+      <div className="button-container">
+        <button onClick={handleGuess} disabled={isLoading}>
+          {isLoading ? "Submitting..." : "Submit Guess"}
+        </button>
+      </div>
       {error && <p>{error}</p>}
       <div className="graph-container">
         <GraphCanvas dataPoints={dataPoints} />
