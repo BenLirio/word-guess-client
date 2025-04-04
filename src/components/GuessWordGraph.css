@@ -2,7 +2,7 @@
   margin: 0 auto;
   padding: 20px;
   text-align: center;
-  font-family: Arial, sans-serif;
+  font-family: "Press Start 2P", monospace; /* Retro pixelated font */
   background-color: #1e1e1e; /* Dark background */
   color: #f5f5f5; /* Light text */
   border-radius: 10px;
@@ -12,7 +12,8 @@
 h2 {
   font-size: 24px;
   margin-bottom: 20px;
-  color: #ffffff; /* White text for the heading */
+  color: #e0e0e0; /* Soft white color */
+  text-shadow: none; /* Remove text glow */
 }
 
 input[type="text"] {
@@ -22,38 +23,49 @@ input[type="text"] {
   border: 1px solid #444; /* Darker border */
   border-radius: 5px;
   font-size: 16px;
+  font-family: "Press Start 2P", monospace; /* Retro pixelated font */
   background-color: #2a2a2a; /* Dark input background */
   color: #f5f5f5; /* Light text */
+  text-shadow: none; /* Remove text glow */
 }
 
 input[type="text"]:focus {
   outline: none;
   border-color: #007bff; /* Blue border on focus */
   box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  text-shadow: none; /* Remove text glow */
 }
 
 button {
   padding: 10px 20px;
   font-size: 16px;
-  color: #fff;
-  background-color: #007bff; /* Blue button */
-  border: none;
-  border-radius: 5px;
+  font-family: "Press Start 2P", monospace; /* Retro pixelated font */
+  color: #00ff00; /* Neon green text */
+  background-color: transparent; /* Transparent background */
+  border: 2px solid #00ff00; /* Neon green border */
+  border-radius: 0; /* Sharp edges */
   cursor: pointer;
+  text-shadow: none; /* Remove text glow */
+  box-shadow: none; /* Remove button glow */
 }
 
 button:disabled {
-  background-color: #555; /* Disabled button in dark mode */
+  background-color: transparent; /* Transparent background for disabled button */
+  border-color: #444; /* Darker gray border for disabled button */
+  color: #444; /* Darker gray text for disabled button */
   cursor: not-allowed;
 }
 
 button:hover:not(:disabled) {
-  background-color: #0056b3; /* Darker blue on hover */
+  background-color: transparent; /* Keep the background transparent */
+  color: #00ff00; /* Neon green text on hover */
+  border-color: #00cc00; /* Slightly darker green border on hover */
 }
 
 p {
   color: #ff6b6b; /* Light red for error messages */
   font-size: 14px;
+  font-family: "Press Start 2P", monospace; /* Retro pixelated font */
   margin-top: 10px;
 }
 

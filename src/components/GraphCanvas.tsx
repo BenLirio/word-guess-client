@@ -2,10 +2,9 @@ import React, { useRef, useEffect, useState, useCallback } from "react";
 
 // Constants for canvas layout
 const CANVAS_MARGIN = 50;
-const AXIS_LABEL_FONT = "16px Arial";
-const TARGET_RADIUS = 8;
 const DATA_POINT_RADIUS = 3;
 const ARROW_SIZE = 10;
+const TARGET_SIZE_FACTOR = 0.15; // Adjust this value to control the target size relative to the canvas width
 
 interface GraphCanvasProps {
   dataPoints: { x: number; y: number }[];
@@ -44,16 +43,21 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
       CANVAS_MARGIN -
       target.y * (rect.height - 2 * CANVAS_MARGIN);
 
+    // Scale the target size based on the canvas dimensions
+    const scaledTargetSize = rect.width * TARGET_SIZE_FACTOR;
+
     dataPoints.forEach(({ x, y }) => {
       const canvasX = CANVAS_MARGIN + x * (rect.width - 2 * CANVAS_MARGIN);
       const canvasY =
         rect.height - CANVAS_MARGIN - y * (rect.height - 2 * CANVAS_MARGIN);
 
-      const distance = Math.sqrt(
-        Math.pow(canvasX - targetX, 2) + Math.pow(canvasY - targetY, 2)
-      );
-
-      if (distance <= TARGET_RADIUS) {
+      // Check if the data point is inside the target's bounding box
+      if (
+        canvasX >= targetX - scaledTargetSize / 2 &&
+        canvasX <= targetX + scaledTargetSize / 2 &&
+        canvasY >= targetY - scaledTargetSize / 2 &&
+        canvasY <= targetY + scaledTargetSize / 2
+      ) {
         setShowWinModal(true); // Show the win modal
       }
     });
@@ -183,6 +187,7 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
     (ctx: CanvasRenderingContext2D, rect: DOMRect) => {
       if (!target) return;
 
+      // Calculate the target's position
       const targetX =
         CANVAS_MARGIN + target.x * (rect.width - 2 * CANVAS_MARGIN);
       const targetY =
@@ -190,8 +195,17 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
         CANVAS_MARGIN -
         target.y * (rect.height - 2 * CANVAS_MARGIN);
 
+      // Scale the target size based on the canvas dimensions
+      const scaledTargetSize = rect.width * TARGET_SIZE_FACTOR;
+
+      // Draw the square target
       ctx.beginPath();
-      ctx.arc(targetX, targetY, TARGET_RADIUS, 0, 2 * Math.PI);
+      ctx.rect(
+        targetX - scaledTargetSize / 2,
+        targetY - scaledTargetSize / 2,
+        scaledTargetSize,
+        scaledTargetSize
+      );
       ctx.strokeStyle = "red"; // Glowing red
       ctx.lineWidth = 2;
       ctx.shadowColor = "red";
@@ -238,8 +252,8 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
   useEffect(() => {
     // Generate a random target point when the component mounts
     const randomTarget = {
-      x: Math.random(), // Random x between 0 and 1
-      y: Math.random(), // Random y between 0 and 1
+      x: Math.random() * (1 - TARGET_SIZE_FACTOR) + TARGET_SIZE_FACTOR / 2, // Ensure the target stays within horizontal bounds
+      y: Math.random() * (1 - TARGET_SIZE_FACTOR) + TARGET_SIZE_FACTOR / 2, // Ensure the target stays within vertical bounds
     };
     setTarget(randomTarget);
   }, []);
