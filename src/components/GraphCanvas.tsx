@@ -1,5 +1,12 @@
 import React, { useRef, useEffect, useState, useCallback } from "react";
 
+// Constants for canvas layout
+const CANVAS_MARGIN = 50;
+const AXIS_LABEL_FONT = "16px Arial";
+const TARGET_RADIUS = 8;
+const DATA_POINT_RADIUS = 3;
+const ARROW_SIZE = 10;
+
 interface GraphCanvasProps {
   dataPoints: { x: number; y: number }[];
 }
@@ -28,22 +35,25 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
   const checkWinCondition = useCallback(() => {
     if (!target) return;
 
-    const targetRadius = 8; // Same as the target circle radius
     const rect = canvasRef.current?.getBoundingClientRect();
     if (!rect) return;
 
-    const targetX = 50 + target.x * (rect.width - 100);
-    const targetY = rect.height - 50 - target.y * (rect.height - 100);
+    const targetX = CANVAS_MARGIN + target.x * (rect.width - 2 * CANVAS_MARGIN);
+    const targetY =
+      rect.height -
+      CANVAS_MARGIN -
+      target.y * (rect.height - 2 * CANVAS_MARGIN);
 
     dataPoints.forEach(({ x, y }) => {
-      const canvasX = 50 + x * (rect.width - 100);
-      const canvasY = rect.height - 50 - y * (rect.height - 100);
+      const canvasX = CANVAS_MARGIN + x * (rect.width - 2 * CANVAS_MARGIN);
+      const canvasY =
+        rect.height - CANVAS_MARGIN - y * (rect.height - 2 * CANVAS_MARGIN);
 
       const distance = Math.sqrt(
         Math.pow(canvasX - targetX, 2) + Math.pow(canvasY - targetY, 2)
       );
 
-      if (distance <= targetRadius) {
+      if (distance <= TARGET_RADIUS) {
         setShowWinModal(true); // Show the win modal
       }
     });
@@ -53,52 +63,71 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
     ctx.strokeStyle = "white";
     ctx.lineWidth = 1;
 
-    const gridY = rect.height - 50 - 0.5 * (rect.height - 100);
-    const gridX = 50 + 0.5 * (rect.width - 100);
+    const gridY =
+      rect.height - CANVAS_MARGIN - 0.5 * (rect.height - 2 * CANVAS_MARGIN);
+    const gridX = CANVAS_MARGIN + 0.5 * (rect.width - 2 * CANVAS_MARGIN);
 
     // Draw horizontal grid line
     ctx.beginPath();
-    ctx.moveTo(50, gridY);
-    ctx.lineTo(rect.width - 50, gridY);
+    ctx.moveTo(CANVAS_MARGIN, gridY);
+    ctx.lineTo(rect.width - CANVAS_MARGIN, gridY);
     ctx.stroke();
 
     // Draw vertical grid line
     ctx.beginPath();
-    ctx.moveTo(gridX, rect.height - 50);
-    ctx.lineTo(gridX, 50);
+    ctx.moveTo(gridX, rect.height - CANVAS_MARGIN);
+    ctx.lineTo(gridX, CANVAS_MARGIN);
     ctx.stroke();
   };
 
   const drawAxisLabels = (ctx: CanvasRenderingContext2D, rect: DOMRect) => {
-    const gridY = rect.height - 50 - 0.5 * (rect.height - 100);
-    const gridX = 50 + 0.5 * (rect.width - 100);
+    const gridY =
+      rect.height - CANVAS_MARGIN - 0.5 * (rect.height - 2 * CANVAS_MARGIN);
+    const gridX = CANVAS_MARGIN + 0.5 * (rect.width - 2 * CANVAS_MARGIN);
 
     ctx.fillStyle = "white";
-    ctx.font = "16px Arial";
+    ctx.font = AXIS_LABEL_FONT;
 
     // Horizontal axis labels
-    ctx.fillText("big", 20, gridY + 5);
-    ctx.fillText("small", rect.width - 40, gridY + 5);
+    ctx.fillText("big", CANVAS_MARGIN - 30, gridY + 5);
+    ctx.fillText("small", rect.width - CANVAS_MARGIN + 10, gridY + 5);
 
     // Vertical axis labels
-    ctx.fillText("cool", gridX - 20, rect.height - 30);
-    ctx.fillText("lame", gridX - 20, 40);
+    ctx.fillText("cool", gridX - 20, rect.height - CANVAS_MARGIN + 20);
+    ctx.fillText("lame", gridX - 20, CANVAS_MARGIN - 10);
   };
 
   const drawAxisArrows = useCallback(
     (ctx: CanvasRenderingContext2D, rect: DOMRect) => {
-      const gridY = rect.height - 50 - 0.5 * (rect.height - 100);
-      const gridX = 50 + 0.5 * (rect.width - 100);
+      const gridY =
+        rect.height - CANVAS_MARGIN - 0.5 * (rect.height - 2 * CANVAS_MARGIN);
+      const gridX = CANVAS_MARGIN + 0.5 * (rect.width - 2 * CANVAS_MARGIN);
 
       ctx.fillStyle = "white";
 
       // Horizontal axis arrows
-      drawArrow(ctx, rect.width - 50, gridY, -10, -5, -10, 5); // Right end
-      drawArrow(ctx, 50, gridY, 10, -5, 10, 5); // Left end
+      drawArrow(
+        ctx,
+        rect.width - CANVAS_MARGIN,
+        gridY,
+        -ARROW_SIZE,
+        -5,
+        -ARROW_SIZE,
+        5
+      ); // Right end
+      drawArrow(ctx, CANVAS_MARGIN, gridY, ARROW_SIZE, -5, ARROW_SIZE, 5); // Left end
 
       // Vertical axis arrows
-      drawArrow(ctx, gridX, 50, -5, 10, 5, 10); // Up end
-      drawArrow(ctx, gridX, rect.height - 50, -5, -10, 5, -10); // Down end
+      drawArrow(ctx, gridX, CANVAS_MARGIN, -5, ARROW_SIZE, 5, ARROW_SIZE); // Up end
+      drawArrow(
+        ctx,
+        gridX,
+        rect.height - CANVAS_MARGIN,
+        -5,
+        -ARROW_SIZE,
+        5,
+        -ARROW_SIZE
+      ); // Down end
     },
     []
   );
@@ -123,11 +152,12 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
   const drawDataPoints = useCallback(
     (ctx: CanvasRenderingContext2D, rect: DOMRect) => {
       dataPoints.forEach(({ x, y }) => {
-        const canvasX = 50 + x * (rect.width - 100);
-        const canvasY = rect.height - 50 - y * (rect.height - 100);
+        const canvasX = CANVAS_MARGIN + x * (rect.width - 2 * CANVAS_MARGIN);
+        const canvasY =
+          rect.height - CANVAS_MARGIN - y * (rect.height - 2 * CANVAS_MARGIN);
 
         ctx.beginPath();
-        ctx.arc(canvasX, canvasY, 3, 0, 2 * Math.PI);
+        ctx.arc(canvasX, canvasY, DATA_POINT_RADIUS, 0, 2 * Math.PI);
         ctx.fillStyle = "rgba(75, 192, 192, 0.6)";
         ctx.fill();
       });
@@ -139,11 +169,15 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
     (ctx: CanvasRenderingContext2D, rect: DOMRect) => {
       if (!target) return;
 
-      const targetX = 50 + target.x * (rect.width - 100);
-      const targetY = rect.height - 50 - target.y * (rect.height - 100);
+      const targetX =
+        CANVAS_MARGIN + target.x * (rect.width - 2 * CANVAS_MARGIN);
+      const targetY =
+        rect.height -
+        CANVAS_MARGIN -
+        target.y * (rect.height - 2 * CANVAS_MARGIN);
 
       ctx.beginPath();
-      ctx.arc(targetX, targetY, 8, 0, 2 * Math.PI);
+      ctx.arc(targetX, targetY, TARGET_RADIUS, 0, 2 * Math.PI);
       ctx.strokeStyle = "red";
       ctx.lineWidth = 2;
       ctx.stroke();
