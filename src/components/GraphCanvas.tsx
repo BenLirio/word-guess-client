@@ -81,14 +81,49 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
 
     ctx.strokeStyle = "white";
     ctx.lineWidth = 2;
-    ctx.strokeRect(50, 50, rect.width - 100, rect.height - 100);
 
     ctx.fillStyle = "white";
     ctx.font = "16px Arial";
-    ctx.fillText("big", 50, rect.height - 20);
-    ctx.fillText("small", rect.width - 70, rect.height - 20);
-    ctx.fillText("cool", 10, rect.height - 50);
-    ctx.fillText("lame", 10, 60);
+    ctx.fillText("big", 20, gridY + 5); // Adjusted to align with y=0.5
+    ctx.fillText("small", rect.width - 40, gridY + 5); // Adjusted to align with y=0.5
+    ctx.fillText("cool", gridX - 20, rect.height - 30); // Adjusted to align with x=0.5
+    ctx.fillText("lame", gridX - 20, 40); // Adjusted to align with x=0.5
+
+    // Draw horizontal axis arrow (right end)
+    ctx.beginPath();
+    ctx.moveTo(rect.width - 50, gridY); // End of the horizontal axis
+    ctx.lineTo(rect.width - 60, gridY - 5); // Top of the arrow
+    ctx.lineTo(rect.width - 60, gridY + 5); // Bottom of the arrow
+    ctx.closePath();
+    ctx.fillStyle = "white";
+    ctx.fill();
+
+    // Draw horizontal axis arrow (left end)
+    ctx.beginPath();
+    ctx.moveTo(50, gridY); // Start of the horizontal axis
+    ctx.lineTo(60, gridY - 5); // Top of the arrow
+    ctx.lineTo(60, gridY + 5); // Bottom of the arrow
+    ctx.closePath();
+    ctx.fillStyle = "white";
+    ctx.fill();
+
+    // Draw vertical axis arrow (up end)
+    ctx.beginPath();
+    ctx.moveTo(gridX, 50); // End of the vertical axis
+    ctx.lineTo(gridX - 5, 60); // Left of the arrow
+    ctx.lineTo(gridX + 5, 60); // Right of the arrow
+    ctx.closePath();
+    ctx.fillStyle = "white";
+    ctx.fill();
+
+    // Draw vertical axis arrow (down end)
+    ctx.beginPath();
+    ctx.moveTo(gridX, rect.height - 50); // Start of the vertical axis
+    ctx.lineTo(gridX - 5, rect.height - 60); // Left of the arrow
+    ctx.lineTo(gridX + 5, rect.height - 60); // Right of the arrow
+    ctx.closePath();
+    ctx.fillStyle = "white";
+    ctx.fill();
 
     // Draw data points (guesses)
     dataPoints.forEach(({ x, y }) => {
