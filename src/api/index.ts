@@ -13,6 +13,9 @@ import {
   PostWinFunction,
   PostWinRequest,
   PostWinResponse,
+  GetTimeUntilNextGraphFunction,
+  GetTimeUntilNextGraphRequest,
+  GetTimeUntilNextGraphResponse,
 } from "../types";
 
 const API_URL =
@@ -131,6 +134,37 @@ export const postWin: PostWinFunction = async (
         "Content-Type": "application/json",
       },
     });
+    return response.data;
+  } catch (error) {
+    console.error("Error making the API request:", error);
+    throw error;
+  }
+};
+
+/**
+ * Sends a request to get the time until the next graph update from the API and returns the response.
+ * @param request - The request object (empty for this function).
+ * @returns The API response containing the time until the next graph update.
+ * @throws An error if the request fails.
+ */
+export const getTimeUntilNextGraph: GetTimeUntilNextGraphFunction = async (
+  request: GetTimeUntilNextGraphRequest
+): Promise<GetTimeUntilNextGraphResponse> => {
+  const payload: RequestWrapper = {
+    functionName: "getTimeUntilNextGraph",
+    request,
+  };
+
+  try {
+    const response = await axios.post<GetTimeUntilNextGraphResponse>(
+      API_URL,
+      payload,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
     return response.data;
   } catch (error) {
     console.error("Error making the API request:", error);
