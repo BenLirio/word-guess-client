@@ -34,6 +34,12 @@ const GuessWordGraph: React.FC = () => {
   return (
     <div className="container">
       <h2>Guess Word Graph</h2>
+      <p>
+        <em>
+          Guess a word and see how an AI ranks it on two dimensions—your mission
+          is to land it inside the red square. Good luck!
+        </em>
+      </p>
       <div className="input-container">
         <input
           type="text"
