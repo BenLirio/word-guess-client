@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState, useCallback } from "react";
-import { getSpectrum, getTarget } from "../api"; // Import the getSpectrum function
+import { getSpectrum, getTarget } from "../api";
 import { GetSpectrumResponse, GuessWordResponse, WordTarget } from "../types";
+import WinModal from "./WinModal"; // Import the new WinModal component
 
 // Constants for canvas layout
 const CANVAS_MARGIN = 50;
@@ -15,7 +16,9 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [target, setTarget] = useState<WordTarget | null>(null);
-  const [showWinModal, setShowWinModal] = useState(false);
+  const [winningGuess, setWinningGuess] = useState<GuessWordResponse | null>(
+    null
+  );
   const [spectrumLabels, setSpectrumLabels] =
     useState<GetSpectrumResponse | null>(null);
 
@@ -35,8 +38,8 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
   };
 
   const checkWinCondition = useCallback(() => {
-    const won = dataPoints.filter(({ hitTarget }) => hitTarget).length > 0;
-    setShowWinModal(won);
+    const winningGuess = dataPoints.find(({ hitTarget }) => hitTarget);
+    setWinningGuess(winningGuess || null);
   }, [dataPoints]);
 
   const drawGrid = (ctx: CanvasRenderingContext2D, rect: DOMRect) => {
@@ -293,25 +296,7 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
           }}
         />
       </div>
-      {showWinModal && (
-        <div
-          style={{
-            width: "100%",
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            backgroundColor: "yellow",
-            padding: "20px",
-            borderRadius: "10px",
-            textAlign: "center",
-            animation: "pop-in 0.5s ease",
-          }}
-        >
-          <h1 style={{ fontSize: "2rem", color: "red" }}>🎉 YOU WIN! 🎉</h1>
-          <p style={{ fontSize: "1.2rem" }}>Great job hitting the target!</p>
-        </div>
-      )}
+      {winningGuess && <WinModal winningGuess={winningGuess} />}
     </div>
   );
 };

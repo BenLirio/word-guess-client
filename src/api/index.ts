@@ -10,6 +10,9 @@ import {
   GetTargetFunction,
   GetTargetRequest,
   GetTargetResponse,
+  PostWinFunction,
+  PostWinRequest,
+  PostWinResponse,
 } from "../types";
 
 const API_URL =
@@ -91,6 +94,39 @@ export const getTarget: GetTargetFunction = async (
 
   try {
     const response = await axios.post<GetTargetResponse>(API_URL, payload, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error making the API request:", error);
+    throw error;
+  }
+};
+
+/**
+ * Sends a request to post a win to the API and returns the response.
+ * @param request - The request object containing the win details.
+ * @returns The API response.
+ * @throws An error if the request fails.
+ */
+export const postWin: PostWinFunction = async (
+  request: PostWinRequest
+): Promise<PostWinResponse> => {
+  if (!request || !request.token || !request.username) {
+    throw new Error(
+      "The request object with valid 'token' and 'username' is required."
+    );
+  }
+
+  const payload: RequestWrapper = {
+    functionName: "postWin",
+    request,
+  };
+
+  try {
+    const response = await axios.post<PostWinResponse>(API_URL, payload, {
       headers: {
         "Content-Type": "application/json",
       },
