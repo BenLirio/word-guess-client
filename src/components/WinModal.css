@@ -27,7 +27,34 @@
 
 .win-modal-details {
   font-size: 1rem;
-  color: #00ff00; /* Neon green for details */
+  color: #f5f5f5; /* Off-white for the default text */
+}
+
+.win-modal-word {
+  color: #00ff00; /* Neon green for the winning word */
+}
+
+.win-modal em {
+  display: block; /* Ensures the text is on a new line */
+  margin-top: 10px; /* Adds space between the input and the <em> text */
+  font-size: 0.9rem; /* Makes the text slightly smaller */
+  color: #666; /* Makes the font less prominent with a gray color */
+  font-style: italic; /* Keeps the italic style */
+}
+
+.win-modal-close-button {
+  position: absolute;
+  top: 10px; /* Adjust as needed */
+  right: 10px; /* Adjust as needed */
+  font-size: 24px; /* Make the button smaller */
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #f5f5f5;
+}
+
+.win-modal-close-button:hover {
+  color: #000; /* Optional: Add hover effect */
 }
 
 @keyframes pop-in {

@@ -296,7 +296,12 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
           }}
         />
       </div>
-      {winningGuess && <WinModal winningGuess={winningGuess} />}
+      {winningGuess && (
+        <WinModal
+          winningGuess={winningGuess}
+          closeModal={() => setWinningGuess(null)}
+        />
+      )}
     </div>
   );
 };
