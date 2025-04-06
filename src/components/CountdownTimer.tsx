@@ -1,29 +1,46 @@
 import React, { useEffect, useState } from "react";
 import "./CountdownTime.css";
 import { getTimeUntilNextGraph } from "../api";
+import { useRefreshTriggerContext } from "../context/RefreshTriggerContext";
 
 const CountdownTimer: React.FC = () => {
-  const targetTime = new Date("2025-04-05T00:00:00").getTime(); // Dummy timestamp
-  const [timeLeft, setTimeLeft] = useState(targetTime - Date.now());
+  const [timeOfNextGraph, setTimeOfNextGraph] = useState<number | null>(null);
+  const [timeMod, setTimeMod] = useState<number | null>(null);
+  const [timeLeft, setTimeLeft] = useState<number | null>(null);
+
+  const { refreshTrigger, setRefreshTrigger } = useRefreshTriggerContext();
 
   useEffect(() => {
     const fetchTimeUntilNextGraph = async () => {
       try {
-        const { timeUntilNextGraph } = await getTimeUntilNextGraph({});
-        setTimeLeft(timeUntilNextGraph);
+        const { timeOfNextGraph, timeMod } = await getTimeUntilNextGraph({});
+        setTimeOfNextGraph(timeOfNextGraph);
+        setTimeMod(timeMod);
       } catch (error) {
         console.error("Error fetching time until next graph:", error);
       }
     };
-
     fetchTimeUntilNextGraph();
 
     const intervalId = setInterval(() => {
-      setTimeLeft((prevTime) => prevTime - 1000);
-    }, 1000);
+      if (timeOfNextGraph === null || timeMod === null) {
+        return;
+      }
+      const now = Date.now();
+      if (now >= timeOfNextGraph) {
+        setTimeOfNextGraph((prevTimeOfNextGraph) => {
+          if (prevTimeOfNextGraph === null) return null;
+          return prevTimeOfNextGraph + timeMod;
+        });
+
+        // Toggle the refresh trigger when the countdown resets
+        setRefreshTrigger(!refreshTrigger);
+      }
+      setTimeLeft(Math.max(0, timeOfNextGraph - now));
+    }, 100);
 
     return () => clearInterval(intervalId);
-  }, [targetTime]);
+  }, [timeMod, timeOfNextGraph, refreshTrigger, setRefreshTrigger]);
 
   const formatTime = (milliseconds: number) => {
     const totalSeconds = Math.floor(milliseconds / 1000);
@@ -36,7 +53,7 @@ const CountdownTimer: React.FC = () => {
 
   return (
     <div className="countdown-timer">
-      <p>Next graph in: {timeLeft > 0 ? formatTime(timeLeft) : "Now!"}</p>
+      {timeLeft != null && <p>Next graph in: {formatTime(timeLeft)}</p>}
     </div>
   );
 };

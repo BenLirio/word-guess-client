@@ -22,21 +22,6 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
   const [spectrumLabels, setSpectrumLabels] =
     useState<GetSpectrumResponse | null>(null);
 
-  const setAspectRatio = () => {
-    if (containerRef.current) {
-      const windowWidth = window.innerWidth;
-      const windowHeight = window.innerHeight;
-      const width = Math.min(windowWidth, windowHeight) * 0.8;
-      containerRef.current.style.width = `${width}px`;
-
-      const canvas = canvasRef.current;
-      if (canvas) {
-        canvas.style.width = `${width}px`;
-        canvas.style.height = `${width}px`;
-      }
-    }
-  };
-
   const checkWinCondition = useCallback(() => {
     const winningGuess = dataPoints.find(({ hitTarget }) => hitTarget);
     setWinningGuess(winningGuess || null);
@@ -232,14 +217,6 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
   }, [drawAxisArrows, drawAxisLabels, drawDataPoints, drawTarget]);
 
   useEffect(() => {
-    setAspectRatio();
-    window.addEventListener("resize", setAspectRatio);
-    return () => {
-      window.removeEventListener("resize", setAspectRatio);
-    };
-  }, []);
-
-  useEffect(() => {
     drawGraph();
     checkWinCondition();
   }, [drawGraph, checkWinCondition]);
@@ -290,7 +267,7 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
           ref={canvasRef}
           style={{
             width: "100%",
-            height: "100%",
+            aspectRatio: "1 / 1",
             display: "block",
             borderRadius: "10px",
           }}

@@ -33,7 +33,8 @@ export type GuessWordFunction = (
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface GetTimeUntilNextGraphRequest {}
 export type GetTimeUntilNextGraphResponse = {
-  timeUntilNextGraph: number;
+  timeOfNextGraph: number;
+  timeMod: number;
 };
 export type GetTimeUntilNextGraphFunction = (
   request: GetTimeUntilNextGraphRequest
