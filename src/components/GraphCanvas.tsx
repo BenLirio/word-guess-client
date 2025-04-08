@@ -34,9 +34,10 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
     ctx.strokeStyle = "#00FF00"; // Neon green
     ctx.lineWidth = 1;
 
-    const gridY =
-      rect.height - CANVAS_MARGIN - 0.5 * (rect.height - 2 * CANVAS_MARGIN);
-    const gridX = CANVAS_MARGIN + 0.5 * (rect.width - 2 * CANVAS_MARGIN);
+    const innerGridHeight = rect.height - 2 * CANVAS_MARGIN;
+    const innerGridWidth = rect.width - 2 * CANVAS_MARGIN;
+    const gridY = CANVAS_MARGIN + 0.5 * innerGridHeight;
+    const gridX = CANVAS_MARGIN + 0.5 * innerGridWidth;
 
     // Draw horizontal grid line
     ctx.beginPath();
@@ -169,25 +170,27 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
   const drawTarget = useCallback(
     (ctx: CanvasRenderingContext2D, rect: DOMRect) => {
       if (!target) return;
-
-      // Calculate the target's position
-      const targetX =
-        CANVAS_MARGIN + target.x * (rect.width - 2 * CANVAS_MARGIN);
-      const targetY =
-        rect.height -
-        CANVAS_MARGIN -
-        target.y * (rect.height - 2 * CANVAS_MARGIN);
+      const innerGridHeight = rect.height - 2 * CANVAS_MARGIN;
+      const innerGridWidth = rect.width - 2 * CANVAS_MARGIN;
+      if (Math.abs(innerGridHeight - innerGridWidth) > 0.001) {
+        console.error(
+          "Canvas is not square. Need to adjust the target size calculation."
+        );
+      }
+      const scale = innerGridHeight;
+      const targetX = CANVAS_MARGIN + target.x * scale;
+      const targetY = rect.height - (CANVAS_MARGIN + target.y * scale);
 
       // Scale the target size based on the canvas dimensions
-      const scaledTargetSize = rect.width * target.size;
+      const scaledTargetSize = scale * target.size;
 
       // Draw the square target
       ctx.beginPath();
       ctx.rect(
-        targetX - scaledTargetSize / 2,
-        targetY - scaledTargetSize / 2,
-        scaledTargetSize,
-        scaledTargetSize
+        targetX - scaledTargetSize,
+        targetY - scaledTargetSize,
+        scaledTargetSize * 2,
+        scaledTargetSize * 2
       );
       ctx.strokeStyle = "red"; // Glowing red
       ctx.lineWidth = 2;
