@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState, useCallback } from "react";
 import { getSpectrum, getTarget } from "../api";
 import { GetSpectrumResponse, GuessWordResponse, WordTarget } from "../types";
 import WinModal from "./WinModal"; // Import the new WinModal component
+import { useRefreshTriggerContext } from "../context/RefreshTriggerContext";
 
 // Constants for canvas layout
 const CANVAS_MARGIN = 50;
@@ -19,6 +20,8 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
   const [winningGuess, setWinningGuess] = useState<GuessWordResponse | null>(
     null
   );
+  const { refreshTrigger } = useRefreshTriggerContext();
+
   const [spectrumLabels, setSpectrumLabels] =
     useState<GetSpectrumResponse | null>(null);
 
@@ -233,7 +236,7 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
     };
 
     fetchSpectrumLabels();
-  }, []);
+  }, [refreshTrigger]);
 
   useEffect(() => {
     // Fetch target
@@ -247,7 +250,7 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
     };
 
     fetchTarget();
-  }, []);
+  }, [refreshTrigger]);
 
   return (
     <div

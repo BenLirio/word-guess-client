@@ -8,7 +8,7 @@ const CountdownTimer: React.FC = () => {
   const [timeMod, setTimeMod] = useState<number | null>(null);
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
 
-  const { refreshTrigger, setRefreshTrigger } = useRefreshTriggerContext();
+  const { setRefreshTrigger } = useRefreshTriggerContext();
 
   useEffect(() => {
     const fetchTimeUntilNextGraph = async () => {
@@ -21,7 +21,9 @@ const CountdownTimer: React.FC = () => {
       }
     };
     fetchTimeUntilNextGraph();
+  }, []);
 
+  useEffect(() => {
     const intervalId = setInterval(() => {
       if (timeOfNextGraph === null || timeMod === null) {
         return;
@@ -34,13 +36,13 @@ const CountdownTimer: React.FC = () => {
         });
 
         // Toggle the refresh trigger when the countdown resets
-        setRefreshTrigger(!refreshTrigger);
+        setRefreshTrigger((prev) => !prev);
       }
       setTimeLeft(Math.max(0, timeOfNextGraph - now));
     }, 100);
 
     return () => clearInterval(intervalId);
-  }, [timeMod, timeOfNextGraph, refreshTrigger, setRefreshTrigger]);
+  }, [timeMod, timeOfNextGraph, setRefreshTrigger]);
 
   const formatTime = (milliseconds: number) => {
     const totalSeconds = Math.floor(milliseconds / 1000);

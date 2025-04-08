@@ -3,7 +3,7 @@ import React, { createContext, useState, ReactNode, useContext } from "react";
 // Define the shape of the context
 interface RefreshTriggerContextType {
   refreshTrigger: boolean;
-  setRefreshTrigger: (newValue: boolean) => void;
+  setRefreshTrigger: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 // Create the context with a default value
