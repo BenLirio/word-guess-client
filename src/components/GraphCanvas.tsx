@@ -4,6 +4,7 @@ import { GetSpectrumResponse, GuessWordResponse, WordTarget } from "../types";
 import WinModal from "./WinModal"; // Import the new WinModal component
 import { useRefreshTriggerContext } from "../context/RefreshTriggerContext";
 import { useLeaderboard } from "../context/LeaderboardContext";
+import { useSelectedPoint } from "../context/SelectedPointContext";
 
 // Constants for canvas layout
 const CANVAS_MARGIN = 50;
@@ -23,15 +24,10 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
   );
   const { refreshTrigger } = useRefreshTriggerContext();
   const { leaderboardEntries } = useLeaderboard();
+  const { selectedPoint, setSelectedPoint } = useSelectedPoint(); // Use context instead of local state
 
   const [spectrumLabels, setSpectrumLabels] =
     useState<GetSpectrumResponse | null>(null);
-
-  const [selectedPoint, setSelectedPoint] = useState<{
-    x: number;
-    y: number;
-    word: string;
-  } | null>(null);
 
   const checkWinCondition = useCallback(() => {
     const winningGuess = dataPoints.find(({ hitTarget }) => hitTarget);
@@ -341,7 +337,7 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
         setSelectedPoint(null); // Deselect if clicking elsewhere
       }
     },
-    [dataPoints, leaderboardEntries]
+    [dataPoints, leaderboardEntries, setSelectedPoint]
   );
 
   useEffect(() => {

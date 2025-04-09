@@ -1,15 +1,24 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { guessWord } from "../api"; // Import the API function
 import GraphCanvas from "./GraphCanvas"; // Import the new GraphCanvas component
 import "./GuessWordGraph.css"; // Import the CSS file
 import { GuessWordResponse } from "../types";
+import { useRefreshTriggerContext } from "../context/RefreshTriggerContext";
+import { useSelectedPoint } from "../context/SelectedPointContext";
 
 const GuessWordGraph: React.FC = () => {
+  const { refreshTrigger } = useRefreshTriggerContext();
   const [dataPoints, setDataPoints] = useState<GuessWordResponse[]>([]);
   const [word, setWord] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const { setSelectedPoint } = useSelectedPoint();
+
+  useEffect(() => {
+    // Reset the data points when the refresh trigger changes
+    setDataPoints([]);
+  }, [refreshTrigger]);
 
   const handleGuess = async () => {
     if (!word) {
@@ -22,7 +31,13 @@ const GuessWordGraph: React.FC = () => {
 
     try {
       const response = await guessWord({ word });
+      setWord(""); // Clear the input field after submission
       setDataPoints((prev) => [...prev, response]);
+      setSelectedPoint({
+        x: response.x,
+        y: response.y,
+        word: response.word,
+      });
     } catch (error) {
       console.error("Error calling the API:", error);
       setError("Failed to fetch data from the API. Please try again.");
@@ -46,6 +61,7 @@ const GuessWordGraph: React.FC = () => {
           value={word}
           onChange={(e) => setWord(e.target.value)}
           placeholder="Enter a word"
+          disabled={isLoading} // Disable input while loading
         />
       </div>
       <div className="button-container">
