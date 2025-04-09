@@ -13,6 +13,15 @@ export interface WordTarget {
   y: number;
   size: number;
 }
+export interface LeaderboardEntry {
+  id: string;
+  username?: string;
+  word: string;
+  x: number;
+  y: number;
+  hitTarget: boolean;
+  timestamp: number;
+}
 
 // ==== guess word ====
 export interface GuessWordRequest {
@@ -24,6 +33,8 @@ export interface GuessWordResponse {
   y: number;
   hitTarget: boolean;
   token?: string;
+  timestamp: number;
+  id: string;
 }
 export type GuessWordFunction = (
   request: GuessWordRequest
@@ -67,23 +78,38 @@ export type PostWinFunction = (
   request: PostWinRequest
 ) => Promise<PostWinResponse>;
 
+// ==== get leaderboard ====
+export interface GetLeaderboardRequest {
+  afterTimestamp?: number;
+}
+export type GetLeaderboardResponse = {
+  timestamp: number;
+  leaderboardEntries: LeaderboardEntry[];
+};
+export type GetLeaderboardFunction = (
+  request: GetLeaderboardRequest
+) => Promise<GetLeaderboardResponse>;
+
 export type RequestType =
   | GuessWordRequest
   | GetSpectrumRequest
   | GetTargetRequest
-  | PostWinRequest;
+  | PostWinRequest
+  | GetLeaderboardRequest;
 export type ResponseType =
   | GuessWordResponse
   | GetSpectrumResponse
   | GetTargetResponse
   | PostWinResponse
-  | GetTimeUntilNextGraphResponse;
+  | GetTimeUntilNextGraphResponse
+  | GetLeaderboardResponse;
 export type FunctionType =
   | GuessWordFunction
   | GetSpectrumFunction
   | GetTargetFunction
   | PostWinFunction
-  | GetTimeUntilNextGraphFunction;
+  | GetTimeUntilNextGraphFunction
+  | GetLeaderboardFunction;
 
 // derive function name from FunctionType
 export type FunctionName =
@@ -91,7 +117,8 @@ export type FunctionName =
   | "getSpectrum"
   | "getTarget"
   | "postWin"
-  | "getTimeUntilNextGraph";
+  | "getTimeUntilNextGraph"
+  | "getLeaderboard";
 export type RequestWrapper = {
   functionName: FunctionName;
   request: RequestType;

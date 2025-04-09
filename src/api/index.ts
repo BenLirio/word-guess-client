@@ -16,6 +16,9 @@ import {
   GetTimeUntilNextGraphFunction,
   GetTimeUntilNextGraphRequest,
   GetTimeUntilNextGraphResponse,
+  GetLeaderboardFunction,
+  GetLeaderboardRequest,
+  GetLeaderboardResponse,
 } from "../types";
 
 const API_URL =
@@ -157,6 +160,37 @@ export const getTimeUntilNextGraph: GetTimeUntilNextGraphFunction = async (
 
   try {
     const response = await axios.post<GetTimeUntilNextGraphResponse>(
+      API_URL,
+      payload,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error making the API request:", error);
+    throw error;
+  }
+};
+
+/**
+ * Sends a request to get the leaderboard data from the API and returns the response.
+ * @param request - The request object containing optional parameters.
+ * @returns The API response containing leaderboard data.
+ * @throws An error if the request fails.
+ */
+export const getLeaderboard: GetLeaderboardFunction = async (
+  request: GetLeaderboardRequest
+): Promise<GetLeaderboardResponse> => {
+  const payload: RequestWrapper = {
+    functionName: "getLeaderboard",
+    request,
+  };
+
+  try {
+    const response = await axios.post<GetLeaderboardResponse>(
       API_URL,
       payload,
       {

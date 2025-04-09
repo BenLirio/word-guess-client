@@ -3,6 +3,7 @@ import { getSpectrum, getTarget } from "../api";
 import { GetSpectrumResponse, GuessWordResponse, WordTarget } from "../types";
 import WinModal from "./WinModal"; // Import the new WinModal component
 import { useRefreshTriggerContext } from "../context/RefreshTriggerContext";
+import { useLeaderboard } from "../context/LeaderboardContext";
 
 // Constants for canvas layout
 const CANVAS_MARGIN = 50;
@@ -21,6 +22,7 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
     null
   );
   const { refreshTrigger } = useRefreshTriggerContext();
+  const { leaderboardEntries } = useLeaderboard();
 
   const [spectrumLabels, setSpectrumLabels] =
     useState<GetSpectrumResponse | null>(null);
@@ -151,6 +153,25 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
 
   const drawDataPoints = useCallback(
     (ctx: CanvasRenderingContext2D, rect: DOMRect) => {
+      const dataPointIds: Record<string, boolean> = {};
+      dataPoints.forEach(({ id }) => {
+        dataPointIds[id] = true;
+      });
+      Object.values(leaderboardEntries)
+        .filter((entry) => !dataPointIds[entry.id])
+        .forEach((entry) => {
+          const { x, y } = entry;
+          const canvasX = CANVAS_MARGIN + x * (rect.width - 2 * CANVAS_MARGIN);
+          const canvasY =
+            rect.height - CANVAS_MARGIN - y * (rect.height - 2 * CANVAS_MARGIN);
+
+          ctx.beginPath();
+          ctx.arc(canvasX, canvasY, DATA_POINT_RADIUS, 0, 2 * Math.PI);
+          ctx.fillStyle = "rgba(255, 255, 0, 0.8)"; // Glowing neon yellow
+          ctx.shadowColor = "#FFFF00";
+          ctx.shadowBlur = 10;
+          ctx.fill();
+        });
       dataPoints.forEach(({ x, y }) => {
         const canvasX = CANVAS_MARGIN + x * (rect.width - 2 * CANVAS_MARGIN);
         const canvasY =
@@ -164,7 +185,7 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
         ctx.fill();
       });
     },
-    [dataPoints]
+    [dataPoints, leaderboardEntries]
   );
 
   const drawTarget = useCallback(
