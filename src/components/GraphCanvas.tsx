@@ -27,6 +27,12 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
   const [spectrumLabels, setSpectrumLabels] =
     useState<GetSpectrumResponse | null>(null);
 
+  const [selectedPoint, setSelectedPoint] = useState<{
+    x: number;
+    y: number;
+    word: string;
+  } | null>(null);
+
   const checkWinCondition = useCallback(() => {
     const winningGuess = dataPoints.find(({ hitTarget }) => hitTarget);
     setWinningGuess(winningGuess || null);
@@ -222,6 +228,35 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
     [target]
   );
 
+  const drawSelectedPoint = useCallback(
+    (ctx: CanvasRenderingContext2D, rect: DOMRect) => {
+      if (!selectedPoint) return;
+
+      const canvasX =
+        CANVAS_MARGIN + selectedPoint.x * (rect.width - 2 * CANVAS_MARGIN);
+      const canvasY =
+        rect.height -
+        CANVAS_MARGIN -
+        selectedPoint.y * (rect.height - 2 * CANVAS_MARGIN);
+
+      // Highlight the selected point
+      ctx.beginPath();
+      ctx.arc(canvasX, canvasY, DATA_POINT_RADIUS + 2, 0, 2 * Math.PI);
+      ctx.fillStyle = "rgba(255, 0, 0, 0.8)"; // Highlight color
+      ctx.fill();
+
+      // Draw annotation
+      ctx.fillStyle = "#FFFFFF"; // White text
+      ctx.font = "14px Arial";
+      ctx.fillText(
+        selectedPoint.word,
+        canvasX + 10, // Offset for readability
+        canvasY - 10
+      );
+    },
+    [selectedPoint]
+  );
+
   const drawGraph = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -241,7 +276,73 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
     drawAxisArrows(ctx, rect);
     drawDataPoints(ctx, rect);
     drawTarget(ctx, rect);
-  }, [drawAxisArrows, drawAxisLabels, drawDataPoints, drawTarget]);
+    drawSelectedPoint(ctx, rect); // Draw the selected point annotation
+  }, [
+    drawAxisArrows,
+    drawAxisLabels,
+    drawDataPoints,
+    drawTarget,
+    drawSelectedPoint,
+  ]);
+
+  const handleCanvasClick = useCallback(
+    (event: React.MouseEvent<HTMLCanvasElement>) => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+
+      const rect = canvas.getBoundingClientRect();
+      const clickX = (event.clientX - rect.left) / rect.width;
+      const clickY = (event.clientY - rect.top) / rect.height;
+
+      // Check green points (dataPoints)
+      const clickedGreenPoint = dataPoints.find(({ x, y }) => {
+        const canvasX = CANVAS_MARGIN + x * (rect.width - 2 * CANVAS_MARGIN);
+        const canvasY =
+          rect.height - CANVAS_MARGIN - y * (rect.height - 2 * CANVAS_MARGIN);
+
+        const distance = Math.sqrt(
+          Math.pow(clickX * rect.width - canvasX, 2) +
+            Math.pow(clickY * rect.height - canvasY, 2)
+        );
+        return distance <= DATA_POINT_RADIUS * 2; // Allow some tolerance
+      });
+
+      if (clickedGreenPoint) {
+        setSelectedPoint({
+          x: clickedGreenPoint.x,
+          y: clickedGreenPoint.y,
+          word: clickedGreenPoint.word,
+        });
+        return;
+      }
+
+      // Check yellow points (leaderboardEntries)
+      const clickedYellowPoint = Object.values(leaderboardEntries).find(
+        ({ x, y }) => {
+          const canvasX = CANVAS_MARGIN + x * (rect.width - 2 * CANVAS_MARGIN);
+          const canvasY =
+            rect.height - CANVAS_MARGIN - y * (rect.height - 2 * CANVAS_MARGIN);
+
+          const distance = Math.sqrt(
+            Math.pow(clickX * rect.width - canvasX, 2) +
+              Math.pow(clickY * rect.height - canvasY, 2)
+          );
+          return distance <= DATA_POINT_RADIUS * 2; // Allow some tolerance
+        }
+      );
+
+      if (clickedYellowPoint) {
+        setSelectedPoint({
+          x: clickedYellowPoint.x,
+          y: clickedYellowPoint.y,
+          word: clickedYellowPoint.word,
+        });
+      } else {
+        setSelectedPoint(null); // Deselect if clicking elsewhere
+      }
+    },
+    [dataPoints, leaderboardEntries]
+  );
 
   useEffect(() => {
     drawGraph();
@@ -292,6 +393,7 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
       >
         <canvas
           ref={canvasRef}
+          onClick={handleCanvasClick} // Attach click handler
           style={{
             width: "100%",
             aspectRatio: "1 / 1",
