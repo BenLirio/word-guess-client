@@ -19,6 +19,9 @@ import {
   GetLeaderboardFunction,
   GetLeaderboardRequest,
   GetLeaderboardResponse,
+  ListWinsFunction,
+  ListWinsRequest,
+  ListWinsResponse,
 } from "../types";
 
 const API_URL =
@@ -199,6 +202,33 @@ export const getLeaderboard: GetLeaderboardFunction = async (
         },
       }
     );
+    return response.data;
+  } catch (error) {
+    console.error("Error making the API request:", error);
+    throw error;
+  }
+};
+
+/**
+ * Sends a request to list all wins from the API and returns the response.
+ * @param request - The request object (empty for this function).
+ * @returns The API response containing the list of wins.
+ * @throws An error if the request fails.
+ */
+export const listWins: ListWinsFunction = async (
+  request: ListWinsRequest
+): Promise<ListWinsResponse> => {
+  const payload: RequestWrapper = {
+    functionName: "listWins",
+    request,
+  };
+
+  try {
+    const response = await axios.post<ListWinsResponse>(API_URL, payload, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
     return response.data;
   } catch (error) {
     console.error("Error making the API request:", error);

@@ -72,11 +72,26 @@ export interface PostWinRequest {
   token: string;
   username: string;
 }
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface PostWinResponse {}
+export interface PostWinResponse {
+  incremented: boolean;
+  winCount: number;
+}
 export type PostWinFunction = (
   request: PostWinRequest
 ) => Promise<PostWinResponse>;
+
+// ==== list wins ====
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface ListWinsRequest {}
+export type ListWinsResponse = {
+  wins: {
+    username: string;
+    winCount: number;
+  }[];
+};
+export type ListWinsFunction = (
+  request: ListWinsRequest
+) => Promise<ListWinsResponse>;
 
 // ==== get leaderboard ====
 export interface GetLeaderboardRequest {
@@ -95,21 +110,25 @@ export type RequestType =
   | GetSpectrumRequest
   | GetTargetRequest
   | PostWinRequest
-  | GetLeaderboardRequest;
+  | GetLeaderboardRequest
+  | GetTimeUntilNextGraphRequest
+  | ListWinsRequest;
 export type ResponseType =
   | GuessWordResponse
   | GetSpectrumResponse
   | GetTargetResponse
   | PostWinResponse
   | GetTimeUntilNextGraphResponse
-  | GetLeaderboardResponse;
+  | GetLeaderboardResponse
+  | ListWinsResponse;
 export type FunctionType =
   | GuessWordFunction
   | GetSpectrumFunction
   | GetTargetFunction
   | PostWinFunction
   | GetTimeUntilNextGraphFunction
-  | GetLeaderboardFunction;
+  | GetLeaderboardFunction
+  | ListWinsFunction;
 
 // derive function name from FunctionType
 export type FunctionName =
@@ -118,7 +137,8 @@ export type FunctionName =
   | "getTarget"
   | "postWin"
   | "getTimeUntilNextGraph"
-  | "getLeaderboard";
+  | "getLeaderboard"
+  | "listWins";
 export type RequestWrapper = {
   functionName: FunctionName;
   request: RequestType;

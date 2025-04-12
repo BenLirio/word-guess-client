@@ -7,6 +7,8 @@ import {
 import { getLeaderboard } from "../api";
 import { useRefreshTriggerContext } from "./RefreshTriggerContext";
 
+const REFRESH_EVERY_N_MS = 10000000;
+
 interface LeaderboardContextValue {
   leaderboardEntries: Record<string, LeaderboardEntry>;
   loading: boolean;
@@ -57,7 +59,7 @@ export const LeaderboardProvider: React.FC<{ children: React.ReactNode }> = ({
 
     const intervalId = setInterval(() => {
       fetchLeaderboard(lastTimestamp);
-    }, 5000);
+    }, REFRESH_EVERY_N_MS);
 
     return () => clearInterval(intervalId);
   }, [refreshTrigger]);

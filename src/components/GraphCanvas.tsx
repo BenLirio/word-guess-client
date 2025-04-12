@@ -30,13 +30,19 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
     useState<GetSpectrumResponse | null>(null);
 
   const checkWinCondition = useCallback(() => {
-    const winningGuess = dataPoints.find(({ hitTarget }) => hitTarget);
-    setWinningGuess(winningGuess || null);
+    if (dataPoints.length === 0) {
+      return;
+    }
+    const winningGuess = dataPoints[dataPoints.length - 1];
+    if (winningGuess.hitTarget) {
+      setWinningGuess(winningGuess);
+    }
   }, [dataPoints]);
 
   useEffect(() => {
+    checkWinCondition();
     setSelectedPoint(null);
-  }, [refreshTrigger, setSelectedPoint]);
+  }, [checkWinCondition, refreshTrigger, setSelectedPoint]);
 
   const drawGrid = (ctx: CanvasRenderingContext2D, rect: DOMRect) => {
     ctx.strokeStyle = "#00FF00"; // Neon green
