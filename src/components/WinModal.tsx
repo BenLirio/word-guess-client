@@ -70,16 +70,11 @@ const WinModal: React.FC<WinModalProps> = ({
             Save to Leaderboard
           </button>
         )}
-        {!postCompleted && (
-          <em>
-            This triggers a discord bot workflow to post your winning word and
-            username
-          </em>
-        )}
         {postCompleted && (
           <footer className="footer">
             <p>
-              Thanks for playing, you can see winners on{" "}
+              Thanks for playing, for bug reports or feature requests please
+              join our{" "}
               <a
                 href="https://discord.gg/byVdbGEk"
                 target="_blank"

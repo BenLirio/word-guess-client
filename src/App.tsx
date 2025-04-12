@@ -5,6 +5,7 @@ import CountdownTimer from "./components/CountdownTimer";
 import { RefreshTriggerProvider } from "./context/RefreshTriggerContext";
 import { LeaderboardProvider } from "./context/LeaderboardContext";
 import { SelectedPointProvider } from "./context/SelectedPointContext";
+import WinList from "./components/WinList";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
           <div className="app-container">
             <CountdownTimer />
             <GuessWordGraph />
+            <WinList />
             <Footer />
           </div>
         </SelectedPointProvider>

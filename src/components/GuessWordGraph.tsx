@@ -38,9 +38,17 @@ const GuessWordGraph: React.FC = () => {
         y: response.y,
         word: response.word,
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error calling the API:", error);
-      setError("Failed to fetch data from the API. Please try again.");
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        setError(error.response.data.message); // Set error from response body
+      } else {
+        setError("An unexpected error occurred."); // Fallback error message
+      }
     } finally {
       setIsLoading(false); // Re-enable the button after the request is complete
     }

@@ -4,7 +4,7 @@ function Footer() {
   return (
     <footer className="footer">
       <p>
-        Winners posted to our{" "}
+        For bug reports or feature requests see our{" "}
         <a
           href="https://discord.gg/byVdbGEk"
           target="_blank"

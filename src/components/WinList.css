@@ -1,0 +1,78 @@
+.win-list {
+  margin: 0 auto;
+  padding: 20px;
+  text-align: center;
+  font-family: "Press Start 2P", monospace; /* Retro pixelated font */
+  background-color: #1e1e1e; /* Dark background */
+  border: none; /* Remove light border */
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  margin-top: 20px; /* Space above the list */
+}
+
+.win-list h2 {
+  margin-bottom: 15px;
+  font-size: 1.2em;
+  text-transform: uppercase;
+  color: #e5e5e5;
+}
+
+.win-list ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.win-list li {
+  margin: 8px 0;
+  font-size: 1em;
+  text-shadow: 0 0 5px #00ff00; /* Glowing text effect */
+}
+
+.win-list-error {
+  color: #ff0000; /* Bright red for errors */
+  font-weight: bold;
+  text-shadow: 0 0 5px #ff0000; /* Glowing error text effect */
+}
+
+.win-list-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.win-list-table th,
+.win-list-table td {
+  border: 1px solid #444444; /* Subtle dark gray border */
+  padding: 8px;
+  text-align: center;
+  color: #e5e5e5; /* Off-white text color */
+}
+
+.win-list-table th {
+  background-color: #000000; /* Black background for header */
+  font-size: 1em;
+  text-transform: uppercase;
+  font-family: "Press Start 2P", monospace; /* Retro pixelated font */
+}
+
+.win-list-table td {
+  background-color: #2a2a2a; /* Match the dark background for rows */
+  font-size: 0.9em;
+  font-family: "Press Start 2P", monospace; /* Retro pixelated font */
+}
+
+.win-list-table tr:nth-child(even) td {
+  background-color: #333333; /* Alternate row color to match the theme */
+}
+
+.win-list-table tr:hover td {
+  background-color: #333333; /* Highlight row on hover */
+}
+
+.win-list p em {
+  font-size: 12px; /* Smaller font size */
+  color: #a0a0a0; /* Less prominent light gray color */
+  font-style: italic; /* Keep the italic style */
+  margin-bottom: 15px; /* Add some spacing below */
+}
