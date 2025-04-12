@@ -40,7 +40,6 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
   }, [dataPoints]);
 
   useEffect(() => {
-    checkWinCondition();
     setSelectedPoint(null);
   }, [checkWinCondition, refreshTrigger, setSelectedPoint]);
 
