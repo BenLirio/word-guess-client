@@ -73,6 +73,12 @@ const GuessWordGraph: React.FC = () => {
       <div className="graph-container">
         <GraphCanvas dataPoints={dataPoints} />
       </div>
+      <p>
+        <em>
+          The green points are your guesses and yellow points are other players.
+          Click a point to see what word it is.
+        </em>
+      </p>
     </div>
   );
 };

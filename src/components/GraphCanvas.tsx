@@ -34,6 +34,10 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
     setWinningGuess(winningGuess || null);
   }, [dataPoints]);
 
+  useEffect(() => {
+    setSelectedPoint(null);
+  }, [refreshTrigger, setSelectedPoint]);
+
   const drawGrid = (ctx: CanvasRenderingContext2D, rect: DOMRect) => {
     ctx.strokeStyle = "#00FF00"; // Neon green
     ctx.lineWidth = 1;
