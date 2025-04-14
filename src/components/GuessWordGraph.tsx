@@ -14,6 +14,9 @@ const GuessWordGraph: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { setSelectedPoint } = useSelectedPoint();
+  const [winningGuess, setWinningGuess] = useState<GuessWordResponse | null>(
+    null
+  );
 
   useEffect(() => {
     // Reset the data points when the refresh trigger changes
@@ -38,6 +41,9 @@ const GuessWordGraph: React.FC = () => {
         y: response.y,
         word: response.word,
       });
+      if (response.hitTarget) {
+        setWinningGuess(response);
+      }
     } catch (error: any) {
       console.error("Error calling the API:", error);
       if (
@@ -79,7 +85,11 @@ const GuessWordGraph: React.FC = () => {
       </div>
       {error && <p className="error-message">{error}</p>}
       <div className="graph-container">
-        <GraphCanvas dataPoints={dataPoints} />
+        <GraphCanvas
+          dataPoints={dataPoints}
+          setWinningGuess={setWinningGuess}
+          winningGuess={winningGuess}
+        />
       </div>
       <p>
         <em>

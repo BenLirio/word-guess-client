@@ -13,15 +13,18 @@ const ARROW_SIZE = 10;
 
 interface GraphCanvasProps {
   dataPoints: GuessWordResponse[];
+  winningGuess: GuessWordResponse | null;
+  setWinningGuess: (guess: GuessWordResponse | null) => void;
 }
 
-const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
+const GraphCanvas: React.FC<GraphCanvasProps> = ({
+  dataPoints,
+  winningGuess,
+  setWinningGuess,
+}) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [target, setTarget] = useState<WordTarget | null>(null);
-  const [winningGuess, setWinningGuess] = useState<GuessWordResponse | null>(
-    null
-  );
   const { refreshTrigger } = useRefreshTriggerContext();
   const { leaderboardEntries } = useLeaderboard();
   const { selectedPoint, setSelectedPoint } = useSelectedPoint(); // Use context instead of local state
@@ -29,19 +32,9 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
   const [spectrumLabels, setSpectrumLabels] =
     useState<GetSpectrumResponse | null>(null);
 
-  const checkWinCondition = useCallback(() => {
-    if (dataPoints.length === 0) {
-      return;
-    }
-    const winningGuess = dataPoints[dataPoints.length - 1];
-    if (winningGuess.hitTarget) {
-      setWinningGuess(winningGuess);
-    }
-  }, [dataPoints]);
-
   useEffect(() => {
     setSelectedPoint(null);
-  }, [checkWinCondition, refreshTrigger, setSelectedPoint]);
+  }, [refreshTrigger, setSelectedPoint]);
 
   const drawGrid = (ctx: CanvasRenderingContext2D, rect: DOMRect) => {
     ctx.strokeStyle = "#00FF00"; // Neon green
@@ -351,8 +344,7 @@ const GraphCanvas: React.FC<GraphCanvasProps> = ({ dataPoints }) => {
 
   useEffect(() => {
     drawGraph();
-    checkWinCondition();
-  }, [drawGraph, checkWinCondition]);
+  }, [drawGraph]);
 
   useEffect(() => {
     // Fetch spectrum labels when the component mounts
