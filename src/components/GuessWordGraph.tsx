@@ -62,7 +62,7 @@ const GuessWordGraph: React.FC = () => {
 
   return (
     <div className="container">
-      <h2>Guess Word Graph</h2>
+      <h2>word-guess.com</h2>
       <p>
         <em>
           Guess a word and see how an AI ranks it on two dimensions—your mission
